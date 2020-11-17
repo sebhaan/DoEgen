@@ -6,7 +6,7 @@ In a first step, optimised designs can be automatically generated and efficienci
 
 The second part of DoEgen assists in analysing any derived experiment results in terms of factor importance, correlations, and response analysis for best parameter space selection.
 
-Written by Sebastian Haan (Sydney Informatics Hub, The University of Sydney)
+Author: Sebastian Haan
 
 
 ## Table of Contents
