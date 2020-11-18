@@ -75,7 +75,7 @@ The main functionalities are (sorted in order of typical experiment process):
 
 The DoEgen package is currently considered experimental and has been tested with the libraries specified in `requirements.txt`.
 
-The OApackage requires an installation of SWIG, which can be found at https://www.dev2qa.com/how-to-install-swig-on-macos-linux-and-windows/or can be installed via conda
+The OApackage requires an installation of SWIG (tested with SWIG 3.0.12), which can be found at https://www.dev2qa.com/how-to-install-swig-on-macos-linux-and-windows/or can be installed via conda
 
 ```sh
 conda install swig
@@ -151,7 +151,7 @@ pandoc MANUAL.md -o MANUAL.html
 Design generation with `doegen.py`: 
 Main model for generating optimised designs and computation of efficiencies. 
 Settings are specified in settings yaml file `settings_design.yaml`. 
-If the yaml and .xlsx template files are not yet in your working directory (e.g. after first doegen installation), you can create in the the yaml and excel template files with
+If the yaml and .xlsx template files are not yet in your working directory (e.g. after first DoEgen installation), you can create in the the yaml and excel template files with
 
 ``` bash
 $ python -m doegen.init_config
@@ -311,7 +311,7 @@ Furthermore, multiple other diagnostics plots such as factor-Y correlation and p
 
 ## Comparison to Other DoE Tools
 
-The aim of DoEgen is to provide an open-source tool for researchers to create optimised designs and a framework for transparent evaluation of experiment designs. Moreover, DoEgen aims to assist the result analysis that may allow the researcher a subsequent factor selection,  parameter fine-tuning, or model building. The design generation function of DoEgen is build upon the excellent package `OApackage` and extends it further in terms of design efficiency evaluation, filtering, automation, and experiment analysis. There are multiple other tools available for DoE; the table below provides a brief (preliminary) summary of the main advantages and disadvantages for each tool that has been tested. 
+The aim of DoEgen is to provide an open-source tool for researchers to create optimised designs and a framework for transparent evaluation of experiment designs. Moreover, DoEgen aims to assist the result analysis that may allow the researcher a subsequent factor selection,  parameter fine-tuning, or model building. The design generation function of DoEgen is build upon the excellent package `OApackage` and extends it further in terms of design efficiency evaluation, filtering, automation, and experiment analysis. There are multiple other tools available for DoE; the table below provides a brief (preliminary, subjective, and oversimplified) summary of the main advantages and disadvantages for each tool that has been tested. Users are encouraged to test these tools themselves. 
 
 
 Feature                    |  SAS JMP  |  pyDOE2  | OApackage |  DoEgen  |
@@ -354,11 +354,15 @@ If you make use of this code for your research project, please include the follo
 “This research was supported by the Sydney Informatics Hub, a Core Research Facility of the University of Sydney.”
 
 
-## Contributors
+## Project Contributors
 
-We would like to thank Dietmar Muller (School of Geophyics, University of Sydney) for suggesting the need for this library, Danial Azam (School of Geophyics, University of Sydney) for testing DOEgen on real-world cases, Christopher Howden (SIH, University of Sydney) for
-statistical consultancy, literature suggestions, and documentation
-review, and Joel Nothman for the code review. 
+Key project contributors to the DoEgen project are:
+
+* Sebastian Haan (Sydney Informatics Hub, University of Sydney): Main contributor and software development of DoEgen.
+* Christopher Howden (Sydney Informatics Hub, University of Sydney): Statistical consultancy, literature suggestions, and documentation.
+* Danial Azam (School of Geophyics, University of Sydney): Testing DoEgen on applications for computational geosciences.
+* Joel Nothman (Sydney Informatics Hub, University of Sydney): Code review and improvements with focus on doegen.py.
+* Dietmar Muller (School of Geophyics, University of Sydney): Suggesting the need for this project and developing real-world use cases for geoscience research.
 
 DoEgen has benefited from the OApackage library [OApackage](https://github.com/eendebakpt/oapackage) for the design optimisation code and we would like to thank the researchers who have made their code available as open-source. 
 
