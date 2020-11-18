@@ -41,7 +41,7 @@ The goal of optimising an experimental design is to provide an efficient design 
 
 ## Functionality
 
-If you would like to jumpstart a new experiment and to skip the technical details, you can find a summary of the main usage of DoEgen in [Case Study Use Case].
+If you would like to jumpstart a new experiment and to skip the technical details, you can find a summary of the main usage of DoEgen in [Use Case Study].
 
 Currently, the (preliminary) release contains several functions for generating and evaluating designs. Importing and evaluating external designs is supported (e.g. for comparison to other DoE generator tools). DoE also implements several functions for experiment result analysis and visualisation of parameter space. 
 
@@ -113,10 +113,10 @@ The result table allows to fill in multiple output properties (Y_label: output t
 * `Y Truth` (optional) if the true value available is available for Y. This is required to calculate the RMSE and to select best parameter space.
 * Not currently considered (yet) in result stats computation: `Std Y Exp`, `Std Y Truth`, `Weight PID`
 
-![Experiment Setup Table Header.](figures/Setup_header.png){width=600}
+![Experiment Setup Table Header.](https://github.com/sebhaan/DoEgen/blob/main/figures/Setup_header.png){width=600}
 
 
-![Experiment Result Table Header.](figures/Result_header.png){width=600}
+![Experiment Result Table Header.](https://github.com/sebhaan/DoEgen/blob/main/figures/Result_header.png){width=600}
 
 
 ### Running Tests
@@ -211,7 +211,7 @@ This will deliver (see folder `test/results/`):
 
 In case the user wants to select another design for a different run size, one can covert the design array into a design table with the function `doegen.deogen.array2valuetable()`.
 
-![Example overview plot of the main efficiencies (from 0=worst to 100=best) as function of number of experiments.](figures/Efficiencies.png){width=400}
+![Example overview plot of the main efficiencies (from 0=worst to 100=best) as function of number of experiments.](https://github.com/sebhaan/DoEgen/blob/main/figures/Efficiencies.png){width=400}
 
 
 ### Design Efficiencies
@@ -240,7 +240,7 @@ For further inspection, `doegen.deogen.evaluate_design2` creates also the follow
 * Table of Two-way Interaction Balance
 * Cornerplot of pairwise factor relation with Y
 
-![Pairwise factor correlation plot of an example 8 factor design array with a mix of 3- and 2-level factors. The lines and blue shadows correspond to the linear regression fit and its uncertainty. Two pairs are 100% orthogonal if the linear regression line is horizontal. The diagonal bar charts show the histogram of level values for each factor (perfect level balance if histogram is flat).](figures/pairwise_correlation.png){width=600}
+![Pairwise factor correlation plot of an example 8 factor design array with a mix of 3- and 2-level factors. The lines and blue shadows correspond to the linear regression fit and its uncertainty. Two pairs are 100% orthogonal if the linear regression line is horizontal. The diagonal bar charts show the histogram of level values for each factor (perfect level balance if histogram is flat).](https://github.com/sebhaan/DoEgen/blob/main/figures/pairwise_correlation.png){width=600}
 
 
 
@@ -261,9 +261,9 @@ This will create the following stats tables and plots (see folder `test/expresul
 * An overview plot of all the correlation plots between Y and each factor (see function `plot_regression`)
 * Moreover it will plot Y value for each pairwise combination of factors (see function `plot_3dmap`), which allows the user to visualise categorical factors 
 
-![Overview plot of X-Y Correlation for each factor as function of their level values. On top the linear regression coefficient `r` is shown along the linear regression fit and its uncertainty (line and shadow).](figures/Expresult_correlation_X_1.png){width=600}
+![Overview plot of X-Y Correlation for each factor as function of their level values. On top the linear regression coefficient `r` is shown along the linear regression fit and its uncertainty (line and shadow).](https://github.com/sebhaan/DoEgen/blob/main/figures/Expresult_correlation_X_1.png){width=600}
 
-![Cornerplot of pairwise factor relation with Y. The color(bar) indicates the value of Y.](figures/Expresult_pairwise-correlation_1.png){width=600}
+![Cornerplot of pairwise factor relation with Y. The color(bar) indicates the value of Y.](https://github.com/sebhaan/DoEgen/blob/main/figures/Expresult_pairwise-correlation_1.png){width=600}
 
 
 
@@ -272,7 +272,7 @@ This will create the following stats tables and plots (see folder `test/expresul
 
 Here we demonstrate a typical use case where we would like to first generate and select an optimal experiment design. Then subsequently after running the experiment we would like to answer the question which is the best parameter space  and what parameters are important. Our case study is given by the test example, which consists of 8 factors (parameters) that are specified in the experiment setup table `Experiment_setup_test.xlsx`. 
 
-![Test Experiment Setup Table with 6 discrete and 2 categorical factors. Each factor can have a certain number of levels (values), which are here either 3 or 2](figures/Setup_header_test.png){width=600}
+![Test Experiment Setup Table with 6 discrete and 2 categorical factors. Each factor can have a certain number of levels (values), which are here either 3 or 2](https://github.com/sebhaan/DoEgen/blob/main/figures/Setup_header_test.png){width=600}
 
 The first goal is to generate an efficient design with only a fraction of the entire parameter combination (in our case the full factorial would be $3^6 \times 2^2 = 2916$). The maximum number of experiments (in this case we choose 150) is set in the file `settings_design_test.yaml`, which also specifies input and output directory names, as well as the maximum time for optimising one run (in this case 100 seconds per design optimisation). This configuration will generate and optimize a range of experiments with different design run sizes from 12 to 150, in steps of 6 runsizes (since the lowest common multiple of our mix of 2 and 3 factor levels is 6). Note that the user can also choose a different stepsize, which can done by setting the value in the setting parameter `delta_nrun`.
 Now we are all setup to start the experiment design generation and optimisation script, which we do by running the script doegen.py with the settings file as argument: 
@@ -282,13 +282,13 @@ $ python -m doegen.doegen test/settings_design_test.yaml
 ```
 This will generate for each runsize an optimised design array and a list of efficiencies and diagnostic tables and plots (see [Design Generation] for more details). To simplify the selection of the generated experiment designs, DoEgen suggests automatically three designs: 1) one minimum design (lowest number of runs at given efficiency threshold), 2) one optimal design, and 3) one best design (either equal or has larger experiment run number than optimal design). In our case the three design are selected for run numbers 30 (minimum), 72 (optimal), 90 (best). Since the optimal design has basically almost the same efficiencies as the best design (see figure below) but at a lower cost of  experiment runs, we choose for our experiment the optimal design, which is given in the table `Designtable_optimal_Nrun72.csv`. 
 
-![Result Overview of Experiment Design Generation and the three suggested choices. The most important criteria for a good design are orthogonality (100% means that all factor pairs are 100% orthogonal to each other), level/center balance (100% is best) and two-way interaction balance (100% is best). We also want to make sure that at each pairwise interaction occurs at least one (100% Two-Level Min Efficiency). D-efficiency maximises the determinant of the information matrix $|X^T X|$, which corresponds to minimizing the generalized variance of the parameter estimates for a pre-specified model $X$. Here, D1-efficiency defines the model with only the main effects, while D-efficiency includes also all quadratic terms in the model $X$. Typically D1-efficiency should be larger than 60%, while D-efficiency only increases if number of experiments is much larger than the number of model terms. In this case study we consider only D1-efficiency given that we want to minimize the number of experiments.](figures/Results_overview.png){width=600}
+![Result Overview of Experiment Design Generation and the three suggested choices. The most important criteria for a good design are orthogonality (100% means that all factor pairs are 100% orthogonal to each other), level/center balance (100% is best) and two-way interaction balance (100% is best). We also want to make sure that at each pairwise interaction occurs at least one (100% Two-Level Min Efficiency). D-efficiency maximises the determinant of the information matrix $|X^T X|$, which corresponds to minimizing the generalized variance of the parameter estimates for a pre-specified model $X$. Here, D1-efficiency defines the model with only the main effects, while D-efficiency includes also all quadratic terms in the model $X$. Typically D1-efficiency should be larger than 60%, while D-efficiency only increases if number of experiments is much larger than the number of model terms. In this case study we consider only D1-efficiency given that we want to minimize the number of experiments.](https://github.com/sebhaan/DoEgen/blob/main/figures/Results_overview.png){width=600}
 
-![Header with first 5 rows of the optimal design with 72 experiments](figures/Designtable_optimal_Nrun72.png){width=600}
+![Header with first 5 rows of the optimal design with 72 experiments](https://github.com/sebhaan/DoEgen/blob/main/figures/Designtable_optimal_Nrun72.png){width=600}
 
 Now it is time to run the experiment. In our example, we produce just some random data for the 72 experiments with 10 sensor locations (PID 1 to 10) and one output variable Y (e.g. temperature). To analyse the experiment, the results have to written in a structured table with the format as given in `experiment_results_Nrun72.xlsx` (see description in figure below).   
 
-![Header with first rows of the experiment result table for 72 experiments. Note that the `Nexp` number has to match the experiment design table `Nexp`. Each experiment (label `Nexp`) can have multiple locations or points (identifier# `PID`), e.g., if experiment is run at different locations simultaneously. In addition, it is possible that one has multiple output Y-variates, labeled with identifier `Y :abel` (target property that has to be predicted or evaluated, e.g. Rain and Temperature). The column `Y Exp` holds the experiment result for Y while the column `Y Truth`holds the ground truth value, which is required to calculate the RMSE and to select best parameter space.](figures/Experiment_result_Nrun72_header.png){width=600}
+![Header with first rows of the experiment result table for 72 experiments. Note that the `Nexp` number has to match the experiment design table `Nexp`. Each experiment (label `Nexp`) can have multiple locations or points (identifier# `PID`), e.g., if experiment is run at different locations simultaneously. In addition, it is possible that one has multiple output Y-variates, labeled with identifier `Y :abel` (target property that has to be predicted or evaluated, e.g. Rain and Temperature). The column `Y Exp` holds the experiment result for Y while the column `Y Truth`holds the ground truth value, which is required to calculate the RMSE and to select best parameter space.](https://github.com/sebhaan/DoEgen/blob/main/figures/Experiment_result_Nrun72_header.png){width=600}
 
 To run the experiment analysis script, settings such as for input output directory names are given in the settings file `settings_expresults_test.yaml`, and we can now run the analysis script with 
 ``` bash
@@ -296,13 +296,13 @@ $ python -m doegen.doeval test/settings_expresults_test.yaml
 ```
 This analysis produces a range of diagnostic tables and result plots for each output variable Y (in our case we have only one Y). One of the question of this example use case is to identify what factors are important, which is given in the figure `Ybarplot.png`. The "importance" basically indicates how much a factor changes Y (defined by the maximum average change in Y between any levels). This has the advantage to identify also important factors that have either a low linear regression coefficients with Y (see r values in plot `Expresult_correlation_X.png`) or are categorical. Such insight can be valuable to determine, e.g., which factors should be investigated in more detail in a subsequent experiment or to estiamate which factors have no effect on Y.
 
-![Factor Importance ranked from maximum to lowest change (range) in Y](figures/Ybarplot_1.png){width=600}
+![Factor Importance ranked from maximum to lowest change (range) in Y](https://github.com/sebhaan/DoEgen/blob/main/figures/Ybarplot_1.png){width=600}
 
 Another important question is what are the best parameter values based on the obtained experiment results so far? This question can be answered by computing the Root-Mean-Square-Error between experiment results and ground truth (or alternatively the likelihood if the model predictions include also uncertainties). Table `Experiment_1_RMSE_Top10_sorted.csv` provides an overview of the top 10 experiments sorted as function of their RMSE. Moroever we can calculate the (RMSE-weighted) average of each factor for the top experiments as shown in bar plot below.
 
 ![Picture of Table `Experiment_1_RMSE_Top10_sorted.csv` which shows the factor values of the top 10 experiments based on their RSME values.](figures/Top10.png){width=600}
 
-![Factor values of the top 10 experiments based on their RSME values. The bar heights indicate the top factor's average value and the dark lines their standard deviation. Note that the average and their standard deviation are computed with the weights $RMSE^{-2}$.](figures/BestFactor_Avg1.png){width=600}
+![Factor values of the top 10 experiments based on their RSME values. The bar heights indicate the top factor's average value and the dark lines their standard deviation. Note that the average and their standard deviation are computed with the weights $RMSE^{-2}$.](https://github.com/sebhaan/DoEgen/blob/main/figures/BestFactor_Avg1.png){width=600}
 
 Furthermore, multiple other diagnostics plots such as factor-Y correlation and pairwise correlation maps are generated (see [Experiment Result Analysis] for more details).
 
@@ -360,9 +360,9 @@ Key project contributors to the DoEgen project are:
 
 * Sebastian Haan (Sydney Informatics Hub, University of Sydney): Main contributor and software development of DoEgen.
 * Christopher Howden (Sydney Informatics Hub, University of Sydney): Statistical consultancy, literature suggestions, and documentation.
-* Danial Azam (School of Geophyics, University of Sydney): Testing DoEgen on applications for computational geosciences.
+* Danial Azam (School of Geophysics, University of Sydney): Testing DoEgen on applications for computational geosciences.
 * Joel Nothman (Sydney Informatics Hub, University of Sydney): Code review and improvements with focus on doegen.py.
-* Dietmar Muller (School of Geophyics, University of Sydney): Suggesting the need for this project and developing real-world use cases for geoscience research.
+* Dietmar Muller (School of Geophysics, University of Sydney): Suggesting the need for this project and developing real-world use cases for geoscience research.
 
 DoEgen has benefited from the OApackage library [OApackage](https://github.com/eendebakpt/oapackage) for the design optimisation code and we would like to thank the researchers who have made their code available as open-source. 
 

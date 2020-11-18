@@ -65,7 +65,7 @@ Functionality
 
 If you would like to jumpstart a new experiment and to skip the
 technical details, you can find a summary of the main usage of DoEgen in
-\[Case Study Use Case\].
+[Use Case Study](#use-case-study).
 
 Currently, the (preliminary) release contains several functions for
 generating and evaluating designs. Importing and evaluating external
@@ -175,11 +175,11 @@ https://pypi.org/project/OApackage/.
     `Std Y Exp`, `Std Y Truth`, `Weight PID`
 
 <figure>
-<img src="figures/Setup_header.png" width="600" alt="" /><figcaption>Experiment Setup Table Header.</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Setup_header.png" width="600" alt="" /><figcaption>Experiment Setup Table Header.</figcaption>
 </figure>
 
 <figure>
-<img src="figures/Result_header.png" width="600" alt="" /><figcaption>Experiment Result Table Header.</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Result_header.png" width="600" alt="" /><figcaption>Experiment Result Table Header.</figcaption>
 </figure>
 
 ### Running Tests
@@ -307,7 +307,7 @@ size, one can covert the design array into a design table with the
 function `doegen.deogen.array2valuetable()`.
 
 <figure>
-<img src="figures/Efficiencies.png" width="400" alt="" /><figcaption>Example overview plot of the main efficiencies (from 0=worst to 100=best) as function of number of experiments.</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Efficiencies.png" width="400" alt="" /><figcaption>Example overview plot of the main efficiencies (from 0=worst to 100=best) as function of number of experiments.</figcaption>
 </figure>
 
 ### Design Efficiencies
@@ -348,7 +348,7 @@ the following tables and plots:
 -   Cornerplot of pairwise factor relation with Y
 
 <figure>
-<img src="figures/pairwise_correlation.png" width="600" alt="" /><figcaption>Pairwise factor correlation plot of an example 8 factor design array with a mix of 3- and 2-level factors. The lines and blue shadows correspond to the linear regression fit and its uncertainty. Two pairs are 100% orthogonal if the linear regression line is horizontal. The diagonal bar charts show the histogram of level values for each factor (perfect level balance if histogram is flat).</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/pairwise_correlation.png" width="600" alt="" /><figcaption>Pairwise factor correlation plot of an example 8 factor design array with a mix of 3- and 2-level factors. The lines and blue shadows correspond to the linear regression fit and its uncertainty. Two pairs are 100% orthogonal if the linear regression line is horizontal. The diagonal bar charts show the histogram of level values for each factor (perfect level balance if histogram is flat).</figcaption>
 </figure>
 
 ### Experiment Result Analysis
@@ -381,11 +381,11 @@ This will create the following stats tables and plots (see folder
     visualise categorical factors
 
 <figure>
-<img src="figures/Expresult_correlation_X_1.png" width="600" alt="" /><figcaption>Overview plot of X-Y Correlation for each factor as function of their level values. On top the linear regression coefficient <code>r</code> is shown along the linear regression fit and its uncertainty (line and shadow).</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Expresult_correlation_X_1.png" width="600" alt="" /><figcaption>Overview plot of X-Y Correlation for each factor as function of their level values. On top the linear regression coefficient <code>r</code> is shown along the linear regression fit and its uncertainty (line and shadow).</figcaption>
 </figure>
 
 <figure>
-<img src="figures/Expresult_pairwise-correlation_1.png" width="600" alt="" /><figcaption>Cornerplot of pairwise factor relation with Y. The color(bar) indicates the value of Y.</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Expresult_pairwise-correlation_1.png" width="600" alt="" /><figcaption>Cornerplot of pairwise factor relation with Y. The color(bar) indicates the value of Y.</figcaption>
 </figure>
 
 Use Case Study
@@ -400,7 +400,7 @@ study is given by the test example, which consists of 8 factors
 `Experiment_setup_test.xlsx`.
 
 <figure>
-<img src="figures/Setup_header_test.png" width="600" alt="" /><figcaption>Test Experiment Setup Table with 6 discrete and 2 categorical factors. Each factor can have a certain number of levels (values), which are here either 3 or 2</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Setup_header_test.png" width="600" alt="" /><figcaption>Test Experiment Setup Table with 6 discrete and 2 categorical factors. Each factor can have a certain number of levels (values), which are here either 3 or 2</figcaption>
 </figure>
 
 The first goal is to generate an efficient design with only a fraction
@@ -438,11 +438,11 @@ experiment the optimal design, which is given in the table
 `Designtable_optimal_Nrun72.csv`.
 
 <figure>
-<img src="figures/Results_overview.png" width="600" alt="" /><figcaption>Result Overview of Experiment Design Generation and the three suggested choices. The most important criteria for a good design are orthogonality (100% means that all factor pairs are 100% orthogonal to each other), level/center balance (100% is best) and two-way interaction balance (100% is best). We also want to make sure that at each pairwise interaction occurs at least one (100% Two-Level Min Efficiency). D-efficiency maximises the determinant of the information matrix <span class="math inline">|<em>X</em><sup><em>T</em></sup><em>X</em>|</span>, which corresponds to minimizing the generalized variance of the parameter estimates for a pre-specified model <span class="math inline"><em>X</em></span>. Here, D1-efficiency defines the model with only the main effects, while D-efficiency includes also all quadratic terms in the model <span class="math inline"><em>X</em></span>. Typically D1-efficiency should be larger than 60%, while D-efficiency only increases if number of experiments is much larger than the number of model terms. In this case study we consider only D1-efficiency given that we want to minimize the number of experiments.</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Results_overview.png" width="600" alt="" /><figcaption>Result Overview of Experiment Design Generation and the three suggested choices. The most important criteria for a good design are orthogonality (100% means that all factor pairs are 100% orthogonal to each other), level/center balance (100% is best) and two-way interaction balance (100% is best). We also want to make sure that at each pairwise interaction occurs at least one (100% Two-Level Min Efficiency). D-efficiency maximises the determinant of the information matrix <span class="math inline">|<em>X</em><sup><em>T</em></sup><em>X</em>|</span>, which corresponds to minimizing the generalized variance of the parameter estimates for a pre-specified model <span class="math inline"><em>X</em></span>. Here, D1-efficiency defines the model with only the main effects, while D-efficiency includes also all quadratic terms in the model <span class="math inline"><em>X</em></span>. Typically D1-efficiency should be larger than 60%, while D-efficiency only increases if number of experiments is much larger than the number of model terms. In this case study we consider only D1-efficiency given that we want to minimize the number of experiments.</figcaption>
 </figure>
 
 <figure>
-<img src="figures/Designtable_optimal_Nrun72.png" width="600" alt="" /><figcaption>Header with first 5 rows of the optimal design with 72 experiments</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Designtable_optimal_Nrun72.png" width="600" alt="" /><figcaption>Header with first 5 rows of the optimal design with 72 experiments</figcaption>
 </figure>
 
 Now it is time to run the experiment. In our example, we produce just
@@ -453,7 +453,7 @@ format as given in `experiment_results_Nrun72.xlsx` (see description in
 figure below).
 
 <figure>
-<img src="figures/Experiment_result_Nrun72_header.png" width="600" alt="" /><figcaption>Header with first rows of the experiment result table for 72 experiments. Note that the <code>Nexp</code> number has to match the experiment design table <code>Nexp</code>. Each experiment (label <code>Nexp</code>) can have multiple locations or points (identifier# <code>PID</code>), e.g., if experiment is run at different locations simultaneously. In addition, it is possible that one has multiple output Y-variates, labeled with identifier <code>Y :abel</code> (target property that has to be predicted or evaluated, e.g. Rain and Temperature). The column <code>Y Exp</code> holds the experiment result for Y while the column <code>Y Truth</code>holds the ground truth value, which is required to calculate the RMSE and to select best parameter space.</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Experiment_result_Nrun72_header.png" width="600" alt="" /><figcaption>Header with first rows of the experiment result table for 72 experiments. Note that the <code>Nexp</code> number has to match the experiment design table <code>Nexp</code>. Each experiment (label <code>Nexp</code>) can have multiple locations or points (identifier# <code>PID</code>), e.g., if experiment is run at different locations simultaneously. In addition, it is possible that one has multiple output Y-variates, labeled with identifier <code>Y :abel</code> (target property that has to be predicted or evaluated, e.g. Rain and Temperature). The column <code>Y Exp</code> holds the experiment result for Y while the column <code>Y Truth</code>holds the ground truth value, which is required to calculate the RMSE and to select best parameter space.</figcaption>
 </figure>
 
 To run the experiment analysis script, settings such as for input output
@@ -478,7 +478,7 @@ which factors should be investigated in more detail in a subsequent
 experiment or to estiamate which factors have no effect on Y.
 
 <figure>
-<img src="figures/Ybarplot_1.png" width="600" alt="" /><figcaption>Factor Importance ranked from maximum to lowest change (range) in Y</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Ybarplot_1.png" width="600" alt="" /><figcaption>Factor Importance ranked from maximum to lowest change (range) in Y</figcaption>
 </figure>
 
 Another important question is what are the best parameter values based
@@ -495,7 +495,7 @@ each factor for the top experiments as shown in bar plot below.
 </figure>
 
 <figure>
-<img src="figures/BestFactor_Avg1.png" width="600" alt="" /><figcaption>Factor values of the top 10 experiments based on their RSME values. The bar heights indicate the top factor’s average value and the dark lines their standard deviation. Note that the average and their standard deviation are computed with the weights <span class="math inline"><em>R</em><em>M</em><em>S</em><em>E</em><sup> − 2</sup></span>.</figcaption>
+<img src="https://github.com/sebhaan/DoEgen/blob/main/figures/BestFactor_Avg1.png" width="600" alt="" /><figcaption>Factor values of the top 10 experiments based on their RSME values. The bar heights indicate the top factor’s average value and the dark lines their standard deviation. Note that the average and their standard deviation are computed with the weights <span class="math inline"><em>R</em><em>M</em><em>S</em><em>E</em><sup> − 2</sup></span>.</figcaption>
 </figure>
 
 Furthermore, multiple other diagnostics plots such as factor-Y
@@ -580,11 +580,11 @@ Key project contributors to the DoEgen project are:
     contributor and software development of DoEgen.
 -   Christopher Howden (Sydney Informatics Hub, University of Sydney):
     Statistical consultancy, literature suggestions, and documentation.
--   Danial Azam (School of Geophyics, University of Sydney): Testing
+-   Danial Azam (School of Geophysics, University of Sydney): Testing
     DoEgen on applications for computational geosciences.
 -   Joel Nothman (Sydney Informatics Hub, University of Sydney): Code
     review and improvements with focus on doegen.py.
--   Dietmar Muller (School of Geophyics, University of Sydney):
+-   Dietmar Muller (School of Geophysics, University of Sydney):
     Suggesting the need for this project and developing real-world use
     cases for geoscience research.
 
