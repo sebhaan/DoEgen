@@ -91,7 +91,7 @@ python setup.py install
 or using pip
 
 ``` sh
-pip install geobo
+pip install DoEgen
 ```
 
 Note that OAPackage can be also installed manually by following installation instructions and documentation for OApackage (tested with
