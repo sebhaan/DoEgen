@@ -44,7 +44,7 @@ with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 packages = find_packages()
 
 if __name__ == "__main__":
-    setup(name = 'doegen',
+    setup(name = 'DoEgen',
           author            = "Sebastian Haan",
           author_email      = "sebastian.haan@sydney.edu.au",
           url               = "https://github.com/sebhaan/DoEgen",
