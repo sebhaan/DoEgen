@@ -221,6 +221,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres):
                 + str(nsel)
                 + "_sorted.csv"
             )
+            """ takingh out best parameter weighting since averaging might be misleading
             # best parameter space is based on weighted RMSE of top results
             # Note that these are average parameter estimaets and are not considering multi-modal distributions
             # For multi-modal see list of top resulst
@@ -245,6 +246,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres):
             )
             # plot dataframe table
             plot_table(dfparam_avg, cfg.outpath, "BestFactor_Avg_" + str(ylabel) + ".png")
+            """
             """
             dfparam_avg.plot(kind="bar", y="Weighted Average", yerr="Weigted Stddev")
             plt.tight_layout()
@@ -480,6 +482,31 @@ def plot_regression(df, params, target_name, fname_out):
         ax.annotate("r = {:.3f}".format(r), xy=(0.1, 0.9), xycoords=ax.transAxes)
         plt.savefig(fname_out, dpi=300)
 
+def plot_factordis(df, params, target_name, fname_out):
+    """
+    Creates distribution plot of Y or RMSE for each numeric Variate
+    Note that only numeric data is selected for this plot
+
+    INPUT
+    df: dataframe
+    params: list of factor names
+    target_name: 'Y Exp Mean' or 'RMSE'
+
+    OUTPUT
+    Image with Correlations
+    """
+    # Select numeric variates:
+    columns = df[params]._get_numeric_data().columns
+    nfac = len(columns)
+    nax1 = int(np.sqrt(nfac))
+    nax2 = int(np.ceil(nfac / int(np.sqrt(nfac))))
+    # fig, axs = plt.subplots(nax1, nax2, figsize=(nax1 * 3, nax2 * 3))
+    plt.ioff()  # automatic disables display of figures
+    fig = plt.figure(figsize=(nax1 * 5, nax2 * 4))
+    for i in range(nfac):
+        plt.subplot(nax2, nax1, i + 1)
+        ax = sns.violinplot(y=df[target_name], x=df[columns[i]])
+        plt.savefig(fname_out, dpi=300)
 
 def plot_table(df_table, outpath, fname_out):
     """
@@ -565,8 +592,8 @@ def main():
         # Plot Main factor correlation plot with Y:
         fname_out3 = cfg.outpath + "Expresult_correlation_X-Y_" + str(ylabel) + ".png"
         plot_regression(df, params, 'Y Exp Mean', fname_out3)
-        fname_out4 = cfg.outpath + "Expresult_correlation_X-RMSE_" + str(ylabel) + ".png"
-        plot_regression(df, params, 'RMSE', fname_out4)
+        fname_out4 = cfg.outpath + "Expresult_distribution_X-RMSE_" + str(ylabel) + ".png"
+        plot_factordis(df, params, 'RMSE', fname_out4)
 
     print("FINISHED")
 
