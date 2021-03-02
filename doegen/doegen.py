@@ -11,6 +11,9 @@ Version: 0.1
 License: APGL-3.0
 
 Tested with Python 3.7, see requirements.txt
+
+ToDo:
+update canonical correlation calc due to numpy update of corrcoef
 """
 
 import argparse
@@ -295,7 +298,8 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
         Xnorm_c1, Xnorm_c2 = cca.fit_transform(
             Anorm[:, i].reshape(-1, 1).tolist(), Anorm[:, j].reshape(-1, 1).tolist()
         )
-        Acor_can[i, j] = np.corrcoef(Xnorm_c1[:, 0], Xnorm_c2)[0, 1]
+        #Acor_can[i, j] = np.corrcoef(Xnorm_c1[:, 0], Xnorm_c2)[0, 1] #
+        Acor_can[i, j] = np.corrcoef(Xnorm_c1[:, 0].reshape(-1,1), Xnorm_c2)[0, 1] # Bug here, this need to be fixed with latest numpy version
 
     Acor_can_avg = np.nanmean(abs(Acor_can))
     Acor_can_max = np.nanmax(Acor_can)
@@ -498,7 +502,7 @@ def optimize_design(
         delta_time = delta_time2 - delta_time1
         fac_time = runtime / delta_time
         # print("delta_time: ", delta_time)
-        niter = np.int(100 * fac_time)
+        niter = int(100 * fac_time)
         print("Niteration:", niter)
     with redirect_stdout(devnull):
         scores, design_efficiencies, designs, ngenerated = oapackage.Doptimize(
