@@ -290,12 +290,16 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
     twoleveleff, twolevelmin = 100 * twoleveleff, 100 * twolevelmin
     # Calculate canonical correlation
     Acor_can = np.full((number_of_factors, number_of_factors), np.nan)
-    for i, j in itertools.combinations(range(number_of_factors), 2):
-        cca = CCA(n_components=1)
-        Xnorm_c1, Xnorm_c2 = cca.fit_transform(
-            Anorm[:, i].reshape(-1, 1).tolist(), Anorm[:, j].reshape(-1, 1).tolist()
-        )
-        Acor_can[i, j] = np.corrcoef(Xnorm_c1[:, 0], Xnorm_c2)[0, 1]
+    try:
+        for i, j in itertools.combinations(range(number_of_factors), 2):
+            cca = CCA(n_components=1)
+            Xnorm_c1, Xnorm_c2 = cca.fit_transform(
+                Anorm[:, i].reshape(-1, 1).tolist(), Anorm[:, j].reshape(-1, 1).tolist()
+            )
+            Acor_can[i, j] = np.corrcoef(Xnorm_c1[:, 0], Xnorm_c2.reshape(1,-1))[0, 1] # seems to be a issue with numpy 1.20
+    except:
+        Acor_can = np.nan
+
 
     Acor_can_avg = np.nanmean(abs(Acor_can))
     Acor_can_max = np.nanmax(Acor_can)
@@ -582,7 +586,7 @@ class ExperimentalSetup:
 
     @classmethod
     def read(cls, fname_setup):
-        return cls(*read_setup(fname_setup))
+        return cls(*read_setup_new(fname_setup))
 
 
 def read_setup(fname_setup):
@@ -625,6 +629,74 @@ def read_setup(fname_setup):
                 )
         else:
             print("Error: Parameter Type unknown for " + str(factor_names[i]))
+        level_vals.append(level)
+    return nlevel.tolist(), level_vals, factor_names
+
+
+def read_setup_new(fname_setup):
+    """
+    Reading in experiment design setup file
+    (assume format same as template that is created with create_setupfile.py)
+    INPUT
+    fname_setup: path + filename for experiment setup excel file
+    RETURN
+    list of number of factor levels, list of all factor levels
+    """
+    df = pd.read_excel(fname_setup, na_filter = False)
+    if 'Include (Y/N)' in list(df):
+        df = df[df['Include (Y/N)'] == 'Yes']
+    nlevel = df["Level Number"].values
+    if 'Levels' in list(df):
+        levels = df["Levels"].values
+    else:
+        levels = [''] * len(df)
+    factor_names = df["Parameter Name"].values
+    nfactor = len(factor_names)
+    factype = df["Parameter Type"].values
+    lmin = df["Minimum"].values
+    lmax = df["Maximum"].values
+    level_vals = []
+    for i in range(nfactor):
+        if (levels[i] != '') | (',' in levels[i]):
+            print(levels[i])
+            level = [ x.strip() for x in levels[i].split(',') ]
+            check_numeric = np.asarray([ x.isnumeric() for x in level ])
+            if check_numeric.all():
+                try:
+                    level = np.asarray(level).astype(float).tolist()
+                except:
+                    factype[i] == "Categorical"
+            if len(level) != levels[i]:
+                print('WARNING: NUmber of levels not consistent with levels given')
+                levels[i] = len(level)
+            level_given = True
+        else:
+            level_given = False
+        if not level_given:
+            if factype[i] == "Categorical":
+                print('WARNING: Level names not given for factor ' + str(factor_names[i]))
+                print('Setting level names to L1 ... L' + str(nlevel[i]))
+                level = ["L" + str(k + 1) for k in range(nlevel[i])]
+            elif factype[i] == "Continuous":
+                if np.isfinite(lmin[i]) & np.isfinite(lmax[i]):
+                    level = np.linspace(lmin[i], lmax[i], nlevel[i]).tolist()
+                else:
+                    print(
+                        "Mimimum or Maximum not specified for Parameter "
+                        + str(factor_names[i])
+                        + ". Assuming default range from -1 to 1."
+                    )
+            elif factype[i] == "Discrete":
+                if np.isfinite(lmin[i]) & np.isfinite(lmax[i]):
+                    level = np.linspace(lmin[i], lmax[i], nlevel[i], dtype="int8").tolist()
+                else:
+                    print(
+                        "Mimimum or Maximum not specified for Parameter "
+                        + str(factor_names[i])
+                        + ". Assuming default range from -1 to 1."
+                    )
+            else:
+                print("Error: Parameter Type unknown for " + str(factor_names[i]))
         level_vals.append(level)
     return nlevel.tolist(), level_vals, factor_names
 
