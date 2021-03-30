@@ -1,10 +1,8 @@
-xlrd==1.2.0
-numpy==1.16.3
-pandas==1.0.3
-XlsxWriter==1.2.8
-seaborn==0.9.0
+seaborn==0.11.1
+matplotlib==3.3.4
+pandas==1.2.3
 OApackage==2.6.6
-tabulate==0.8.7
-matplotlib==3.1.0
-PyYAML==5.3.1
-scikit_learn==0.22.2.post1
+XlsxWriter==1.2.8
+numpy==1.20.1
+PyYAML==5.4.1
+scikit_learn==0.24.1
