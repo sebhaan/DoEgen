@@ -297,12 +297,12 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
                 Anorm[:, i].reshape(-1, 1).tolist(), Anorm[:, j].reshape(-1, 1).tolist()
             )
             Acor_can[i, j] = np.corrcoef(Xnorm_c1[:, 0].reshape(-1,1), Xnorm_c2)[0, 1] # seems to be a issue with numpy 1.20
+        Acor_can_avg = np.nanmean(abs(Acor_can))
+        Acor_can_max = np.nanmax(Acor_can)
     except:
-        Acor_can = np.nan
+        Acor_can_avg = np.nan
+        Acor_can_max = np.nan
 
-
-    Acor_can_avg = np.nanmean(abs(Acor_can))
-    Acor_can_max = np.nanmax(Acor_can)
     if printopt:
         print("Center Balance : %.2f" % centereff)
         print("Level Balance : %.2f" % leveleff)
@@ -502,7 +502,7 @@ def optimize_design(
         delta_time = delta_time2 - delta_time1
         fac_time = runtime / delta_time
         # print("delta_time: ", delta_time)
-        niter = np.int(100 * fac_time)
+        niter = int(100 * fac_time)
         print("Niteration:", niter)
     with redirect_stdout(devnull):
         scores, design_efficiencies, designs, ngenerated = oapackage.Doptimize(
