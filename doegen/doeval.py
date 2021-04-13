@@ -14,10 +14,17 @@ Main Capabilities:
 - Pairwise response surface and correlation computation
 - Factor correlation analysis and Two -way intearction response plots
 - Visualisation plots
+
+ToDo:
+Change to Pathlib
+
+Changes to previous version:
+- replace configloader with function arguments
 """
 
 import os
 import sys
+import argparse
 import yaml
 import numpy as np
 import pandas as pd
@@ -107,7 +114,7 @@ def weighted_avg_and_std(values, weights):
     return (average, np.sqrt(variance))
 
 
-def calc_expresults_stats(ylabels, dfdes, dfres):
+def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
     """
 	Computation of statistical evaluation of experimetal results for each predicted y:
 	1) Parameter importance, which is defined by maximum y range over parameter levels (y in averaged for each level)
@@ -120,6 +127,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres):
 	ylabels: label ID for each target variable.
 	dfdes: experiment design dataframe (inlcudes one column Nexp and the other columns the factor names)
 	dfres: experiment result dataframe (Ids in Nexp column must match design array)
+    outpath: path for output files
 	"""
     npar = len(list(dfdes)) - 1
     nexp = len(dfdes)
@@ -172,7 +180,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres):
         )
         plt.title("Range " + str(ylabel))
         plt.tight_layout()
-        plt.savefig(cfg.outpath + "Ybarplot_" + str(ylabel) + ".png", dpi=300)
+        plt.savefig(outpath + "Ybarplot_" + str(ylabel) + ".png", dpi=300)
         plt.close()
         # Save factor importance to csv:
         res = np.vstack((width, ymin_par, ymax_par, ymean_par, ystd_par))
@@ -180,7 +188,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres):
             res.T, columns=["Yrange", "Ymin", "Ymax", "Ymean", "Ystd"], index=params
         )
         dfrange.to_csv(
-            cfg.outpath + "Experiment_" + str(ylabel) + "_Factorimportance.csv"
+            outpath + "Experiment_" + str(ylabel) + "_Factorimportance.csv"
         )
 
         # Calculate RMSE and best parameter space:
@@ -195,7 +203,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres):
                 rmse[i] = np.sqrt(np.nanmean(resid ** 2))
             dfdes_y["RMSE"] = rmse
             # Save overall results to csv with sorted RMSE
-            dfdes_y.to_csv(cfg.outpath + "Experiment_" + str(ylabel) + "_RMSE.csv")
+            dfdes_y.to_csv(outpath + "Experiment_" + str(ylabel) + "_RMSE.csv")
 
             # Calculate best parameters (for only nueric parameters)
             if nexp >= 20:
@@ -214,7 +222,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres):
             )
             print(dfsort.head(nsel))
             dfsort.iloc[0:nsel].to_csv(
-                cfg.outpath
+                outpath
                 + "Experiment_"
                 + str(ylabel)
                 + "_RMSE_Top"
@@ -547,17 +555,20 @@ def plot_table(df_table, outpath, fname_out):
     plt.close()
     
 
-def main():
-    if not os.path.exists(cfg.outpath):
-        os.makedirs(cfg.outpath)
+def main(inpath, fname_results, fname_design, outpath = None):
+
+    if outpath is None:
+        outpath = inpath
+    if not os.path.exists(outpath):
+        os.makedirs(outpath)
     # 1) Read in experiment result data
-    if cfg.fname_results.endswith('.xlsx'):
-        dfres = pd.read_excel(os.path.join(cfg.inpath, cfg.fname_results))
-    elif cfg.fname_results.endswith('.csv'):
-        dfres = pd.read_csv(os.path.join(cfg.inpath, cfg.fname_results))
+    if fname_results.endswith('.xlsx'):
+        dfres = pd.read_excel(os.path.join(inpath, fname_results))
+    elif fname_results.endswith('.csv'):
+        dfres = pd.read_csv(os.path.join(inpath, fname_results))
     # ['Nexp' 'PID', 'Y Label', 'Y Exp', 'Y Truth', 'Std Y Exp', 'Std Y Truth', 'Weight PID']
     # 2) Read in experiment design setup table with parameter sepcifications
-    dfdes = pd.read_csv(os.path.join(cfg.inpath, cfg.fname_design))
+    dfdes = pd.read_csv(os.path.join(inpath, fname_design))
     # dfdes = pd.read_csv('designs_Danial/' + 'designtable_Nrun36.csv' )
 
     # List of different predictable Y properties:
@@ -572,32 +583,42 @@ def main():
     nexp = dfdes.shape[0]
 
     # Calculating main stats (RMSE, parameter importance, best parameters)
-    calc_expresults_stats(ylabels, dfdes, dfres)
+    calc_expresults_stats(ylabels, dfdes, dfres, outpath)
 
     # Visualise correlation results for each Y predictable
     for ylabel in ylabels:
         print("Plotting correlation plots for Ylabel:" + str(ylabel) + " ...")
-        dfname = cfg.outpath + "Experiment_" + str(ylabel) + "_RMSE.csv"
+        dfname = outpath + "Experiment_" + str(ylabel) + "_RMSE.csv"
         df = pd.read_csv(dfname)
         # Plot Pairwise X correlation for Y:
         fname_out1 = (
-            cfg.outpath + "Y-pairwise-correlation_" + str(ylabel) + ".png"
+            outpath + "Y-pairwise-correlation_" + str(ylabel) + ".png"
         )
         plot_3dmap(df, params, "Y Exp Mean", fname_out1)
         # Plot Pairwise X correlation for RMSE
         fname_out2 = (
-            cfg.outpath + "RMSE-pairwise-correlation_" + str(ylabel) + ".png"
+            outpath + "RMSE-pairwise-correlation_" + str(ylabel) + ".png"
         )
         plot_3dmap(df, params, "RMSE", fname_out2)
         # Plot Main factor correlation plot with Y:
-        fname_out3 = cfg.outpath + "Expresult_correlation_X-Y_" + str(ylabel) + ".png"
+        fname_out3 = outpath + "Expresult_correlation_X-Y_" + str(ylabel) + ".png"
         plot_regression(df, params, 'Y Exp Mean', fname_out3)
-        fname_out4 = cfg.outpath + "Expresult_distribution_X-RMSE_" + str(ylabel) + ".png"
+        fname_out4 = outpath + "Expresult_distribution_X-RMSE_" + str(ylabel) + ".png"
         plot_factordis(df, params, 'RMSE', fname_out4)
 
     print("FINISHED")
 
 
+def main_cli():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('settings_path', nargs='?', default='settings_expresults.yaml')
+    args = ap.parse_args()
+    print(f"using settings in: {args.settings_path!r}")
+    with open(args.settings_path) as f:
+        cfg = yaml.safe_load(f)
+    main(**cfg)
+
+
 if __name__ == "__main__":
-    from . import configloader_results as cfg
-    main()
+    #from doegen import configloader_results as cfg
+    main_cli()
