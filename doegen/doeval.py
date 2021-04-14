@@ -26,6 +26,7 @@ import os
 import sys
 import argparse
 import yaml
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from mpl_toolkits import mplot3d
@@ -64,8 +65,7 @@ def create_testdata(outpath, fname_out, Nexp):
 	fname_out: filename in format '*.xlsx'
 	Nexp: NUmber of experiments
 	"""
-    if not os.path.exists(outpath):
-        os.makedirs(outpath)
+    os.makedirs(outpath, exist_ok=True)
     PID = np.arange(1, 11)
     Yexp = np.random.rand(Nexp, len(PID)).flatten()
     Ytruth = np.random.rand(Nexp, len(PID)).flatten()
@@ -558,9 +558,10 @@ def plot_table(df_table, outpath, fname_out):
 def main(inpath, fname_results, fname_design, outpath = None):
 
     if outpath is None:
-        outpath = inpath
-    if not os.path.exists(outpath):
-        os.makedirs(outpath)
+        outpath = inpath = Path(inpath)
+    else:
+        outpath = Path(outpath)
+    os.makedirs(outpath, exist_ok = True)
     # 1) Read in experiment result data
     if fname_results.endswith('.xlsx'):
         dfres = pd.read_excel(os.path.join(inpath, fname_results))

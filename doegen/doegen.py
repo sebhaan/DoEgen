@@ -16,6 +16,7 @@ Tested with Python 3.7, see requirements.txt
 import argparse
 import os
 import sys
+from pathlib import Path
 import time
 from contextlib import redirect_stdout
 from collections import namedtuple
@@ -126,7 +127,7 @@ def test_genhighD(setup, runsize, nkeep=2, outpath=None):
             fname = (
                 "Oarray_" + str(setup.factor_levels) + "_Nrun" + str(runsize) + ".csv"
             )
-            np.savetxt(outpath + fname, np.asarray(Asel), delimiter=",", fmt="%i")
+            np.savetxt(os.path.join(outpath,fname), np.asarray(Asel), delimiter=",", fmt="%i")
             fname = (
                 "Efficiencies_"
                 + str(setup.factor_levels)
@@ -134,7 +135,7 @@ def test_genhighD(setup, runsize, nkeep=2, outpath=None):
                 + str(runsize)
                 + ".csv"
             )
-            np.savetxt(outpath + fname, effs, delimiter=",")
+            np.savetxt(os.path.join(outpath, fname), effs, delimiter=",")
         return Asel, effs
 
 
@@ -535,11 +536,11 @@ def optimize_design(
     if outpath_nrun is not None:
         os.makedirs(outpath_nrun, exist_ok=True)
         fname = "EDarray_" + str(setup.factor_levels) + "_Nrun" + str(runsize) + ".csv"
-        np.savetxt(outpath_nrun + fname, A, delimiter=",", fmt="%i")
+        np.savetxt(os.path.join(outpath_nrun, fname), A, delimiter=",", fmt="%i")
         fname = (
             "Efficiencies_" + str(setup.factor_levels) + "_Nrun" + str(runsize) + ".csv"
         )
-        np.savetxt(outpath_nrun + fname, efficiencies, delimiter=",")
+        np.savetxt(os.path.join(outpath_nrun, fname), efficiencies, delimiter=",")
     return Asel, efficiencies
 
 
@@ -551,7 +552,7 @@ def eval_extarray(setup, path, infname):
 	setup: ExperimentalSetup
 	path, infname: input path and filename of array saved as csv file (without header or index)
 	"""
-    A = np.loadtxt(path + infname, delimiter=",")
+    A = np.loadtxt(os.path.join(path, infname), delimiter=",")
     effs = evaluate_design2(setup, A)
     effs = np.round(effs, 3)
     # centereff, leveleff, orthoeff, twoleveleff, twolevelmin, Deff, D1eff, D2eff, Aeff, A1eff, A2eff = effs
@@ -574,7 +575,7 @@ def eval_extarray(setup, path, infname):
     df_eff = pd.DataFrame(data=effs.reshape(1, -1), columns=header)
     # Assuming infname for input array ends alerady with .csv :
     outfname = "Efficiencies_" + infname
-    df_eff.to_csv(path + outfname, index=False)
+    df_eff.to_csv(os.path.join(path,outfname), index=False)
 
 
 class ExperimentalSetup:
@@ -783,7 +784,7 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
     dfout = np.round(df_eff, 3)
     dfout["Nexp"] = xrun
     fname = "Efficiencies_" + str(setup.factor_levels) + "_combined.csv"
-    dfout.to_csv(outpath + fname, index=False)
+    dfout.to_csv(os.path.join(outpath, fname), index=False)
     plt.ioff()
     dfout.plot(
         "Nexp",
@@ -798,7 +799,7 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
         ],
         sort_columns=True,
     )
-    plt.savefig(outpath + "Efficiencies_" + str(setup.factor_levels) + ".png", dpi=300)
+    plt.savefig(os.path.join(outpath, "Efficiencies_" + str(setup.factor_levels) + ".png"), dpi=300)
     plt.close()
     return effs_array
 
@@ -855,7 +856,7 @@ def print_designselection_summary(results, fname_out=None):
         fout.close()
 
 
-Result = namedtuple("Result", ["name", "runsize", "effs"])
+#Result = namedtuple("Result", ["name", "runsize", "effs"])
 
 
 def main(
@@ -867,10 +868,12 @@ def main(
     delta_nrun=None,
 ):
     if outpath is None:
-        outpath = path
+        outpath = path = Path(path)
+    else:
+        outpath = Path(outpath)
 
     # Read-in experimental design specifications:
-    setup = ExperimentalSetup.read(path + fname_setup)
+    setup = ExperimentalSetup.read(os.path.join(path,fname_setup))
     # print(setup.level_values)
 
     # Calculate number of total possible combinations of all factors:
@@ -908,7 +911,7 @@ def main(
     for i, irun, in enumerate(xrun):
         print("--------------------------------")
         print("Optimizing array for " + str(irun) + " runs ...")
-        outpath_nrun = outpath + "DesignArray_Nrun" + str(int(irun)) + "/"
+        outpath_nrun = os.path.join(outpath, "DesignArray_Nrun" + str(int(irun)) + "/")
         Aopt, effs = optimize_design(
             setup, int(irun), runtime=maxtime_per_run, outpath_nrun=outpath_nrun
         )
@@ -940,7 +943,7 @@ def main(
     dfout = np.round(df_eff, 3)
     dfout["Nexp"] = xrun
     fname = "Efficiencies_" + str(setup.factor_levels) + "_all3.csv"
-    dfout.to_csv(outpath + fname, index=False)
+    dfout.to_csv(os.path.join(outpath, fname), index=False)
 
     # dfout.plot("Nexp", ['Center Balance', 'Level Balance', 'Orthogonality', 'D-Eff', 'D1-Eff', 'A-Eff', 'E-Eff'], sort_columns = True)
     dfout.plot(
@@ -956,7 +959,7 @@ def main(
         sort_columns=True,
     )
     plt.ioff()
-    plt.savefig(outpath + "Efficiencies_" + str(setup.factor_levels) + ".png", dpi=300)
+    plt.savefig(os.path.join(outpath, "Efficiencies_" + str(setup.factor_levels) + ".png"), dpi=300)
     plt.close()
     # seems to be correlation  between orthogonality(levelbvalance) and D1 and
     # plt.scatter(effs_array[:,1], effs_array[:,5])
@@ -1037,8 +1040,7 @@ def main(
     # Convert exp arrays into design tables with user level values
     print("Saving minimum, optimal, and best design as experiment design tables...")
     for result in results.values():
-        fname_array = (
-            outpath
+        fname_array = (os.path.join(outpath,
             + "DesignArray_Nrun"
             + str(result.runsize)
             + "/"
@@ -1046,15 +1048,14 @@ def main(
             + str(setup.factor_levels)
             + "_Nrun"
             + str(result.runsize)
-            + ".csv"
+            + ".csv")
         )
-        fname_out = (
-            outpath
+        fname_out = (os.path.join(outpath
             + "Designtable_"
             + result.name
             + "_Nrun"
             + str(result.runsize)
-            + ".csv"
+            + ".csv")
         )
         array2valuetable(setup, fname_array, fname_out)
 
@@ -1062,7 +1063,7 @@ def main(
     print_designselection_summary(results)
     # and in addition print summary to file:
     print_designselection_summary(
-        results, fname_out=outpath + "Experiment_Design_selection_summary.txt"
+        results, fname_out=os.path.join(outpath, "Experiment_Design_selection_summary.txt")
     )
     print("")
     print("FINISHED")
