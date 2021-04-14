@@ -11,6 +11,9 @@ Version: 0.1
 License: APGL-3.0
 
 Tested with Python 3.7, see requirements.txt
+
+To Do:
+- append factors that are not included to final design arrays
 """
 
 import argparse
@@ -661,7 +664,6 @@ def read_setup_new(fname_setup):
     level_vals = []
     for i in range(nfactor):
         if (levels[i] != '') | (',' in levels[i]):
-            print(levels[i])
             level = [ x.strip() for x in levels[i].split(',') ]
             check_numeric = np.asarray([ x.isnumeric() for x in level ])
             if check_numeric.all():
@@ -669,8 +671,9 @@ def read_setup_new(fname_setup):
                     level = np.asarray(level).astype(float).tolist()
                 except:
                     factype[i] == "Categorical"
-            if len(level) != levels[i]:
-                print('WARNING: NUmber of levels not consistent with levels given')
+            if len(level) != nlevel[i]:
+                print('Levels: ', levels[i])
+                print('WARNING: Number of levels ' + str(nlevel[i]) + ' is not consistent with levels given')
                 levels[i] = len(level)
             level_given = True
         else:
@@ -858,9 +861,6 @@ def print_designselection_summary(results, fname_out=None):
         fout.close()
 
 
-Result = namedtuple("Result", ["name", "runsize", "effs"])
-
-
 def main(
     fname_setup,
     path=None,
@@ -873,6 +873,8 @@ def main(
         outpath = path = Path(path)
     else:
         outpath = Path(outpath)
+
+    
 
     # Read-in experimental design specifications:
     setup = ExperimentalSetup.read(os.path.join(path,fname_setup))
@@ -967,6 +969,7 @@ def main(
     # plt.scatter(effs_array[:,1], effs_array[:,5])
 
     ###### Identify minimum, optimal, and best runsize for experiment:
+    Result = namedtuple("Result", ["name", "runsize", "effs"])
     results = {}
     """Minimum run criteria:
 	runsize > Nfactor + 1
@@ -1041,6 +1044,12 @@ def main(
 
     # Convert exp arrays into design tables with user level values
     print("Saving minimum, optimal, and best design as experiment design tables...")
+    dforig = pd.read_excel(os.path.join(path,fname_setup), na_filter = False)
+    append_orig = False
+    if 'Include (Y/N)' in list(dforig):
+        dforig = dforig[dforig['Include (Y/N)'] == 'No'].copy()
+        if len(dforig) > 0:
+            append_orig = True
     for result in results.values():
         fname_array = (os.path.join(outpath,
             "DesignArray_Nrun"
@@ -1060,6 +1069,14 @@ def main(
             + ".csv")
         )
         array2valuetable(setup, fname_array, fname_out)
+        # Append original factors that are not included in design variation ('Include (Y/N)' = No)   
+        if append_orig:
+            dfnew = pd.read_csv(fname_out) 
+            names_const = dforig[dforig['Include (Y/N)'] == 'No']['Parameter Name'].values
+            level_const = dforig[dforig['Include (Y/N)'] == 'No']['Levels'].values
+            for i in range(len(names_const)):
+                dfnew[names_const[i]] = level_const[i] 
+            dfnew.to_csv(fname_out, index_label="Nexp")
 
     # print summary in terminal:
     print_designselection_summary(results)
