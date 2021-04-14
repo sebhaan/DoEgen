@@ -6,7 +6,7 @@ import subprocess
 import io
 
 ## in development set version
-PYPI_VERSION = '0.1'
+PYPI_VERSION = '0.4'
 
 # Return the git revision as a string (from numpy)
 def git_version():
@@ -56,7 +56,7 @@ if __name__ == "__main__":
                               'xlrd>=1.2.0',
                               'pandas>=1.0.3',
                               'XlsxWriter>=1.2.8',
-                              'seaborn>=0.9.0',
+                              'seaborn>=0.11.1',
                               'OApackage==2.6.6',
                               'tabulate==0.8.7',
                               'matplotlib>=3.1.0',
@@ -75,8 +75,6 @@ if __name__ == "__main__":
                                         'test/results/Designtable_optimal_Nrun72.csv']},
           include_package_data = False,
           classifiers       = ['Programming Language :: Python :: 3',
-                               'Programming Language :: Python :: 3.4',
-                               'Programming Language :: Python :: 3.5',
                                'Programming Language :: Python :: 3.6',
                                'Programming Language :: Python :: 3.7'
                                ]
