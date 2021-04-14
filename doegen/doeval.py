@@ -98,7 +98,7 @@ def create_testdata(outpath, fname_out, Nexp):
         "Weight PID",
     ]
     df = pd.DataFrame(array.T, columns=header)
-    df.to_excel(outpath + fname_out, index=False)
+    df.to_excel(os.path.join(outpath,fname_out), index=False)
 
 
 def weighted_avg_and_std(values, weights):
@@ -180,7 +180,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
         )
         plt.title("Range " + str(ylabel))
         plt.tight_layout()
-        plt.savefig(outpath + "Ybarplot_" + str(ylabel) + ".png", dpi=300)
+        plt.savefig(os.path.join(outpath, "Ybarplot_" + str(ylabel) + ".png"), dpi=300)
         plt.close()
         # Save factor importance to csv:
         res = np.vstack((width, ymin_par, ymax_par, ymean_par, ystd_par))
@@ -188,7 +188,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
             res.T, columns=["Yrange", "Ymin", "Ymax", "Ymean", "Ystd"], index=params
         )
         dfrange.to_csv(
-            outpath + "Experiment_" + str(ylabel) + "_Factorimportance.csv"
+            os.path.join(outpath, "Experiment_" + str(ylabel) + "_Factorimportance.csv")
         )
 
         # Calculate RMSE and best parameter space:
@@ -203,7 +203,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
                 rmse[i] = np.sqrt(np.nanmean(resid ** 2))
             dfdes_y["RMSE"] = rmse
             # Save overall results to csv with sorted RMSE
-            dfdes_y.to_csv(outpath + "Experiment_" + str(ylabel) + "_RMSE.csv")
+            dfdes_y.to_csv(os.path.join(outpath, "Experiment_" + str(ylabel) + "_RMSE.csv"))
 
             # Calculate best parameters (for only nueric parameters)
             if nexp >= 20:
@@ -222,12 +222,12 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
             )
             print(dfsort.head(nsel))
             dfsort.iloc[0:nsel].to_csv(
-                outpath
-                + "Experiment_"
+                os.path.join(outpath,
+                "Experiment_"
                 + str(ylabel)
                 + "_RMSE_Top"
                 + str(nsel)
-                + "_sorted.csv"
+                + "_sorted.csv")
             )
             """ takingh out best parameter weighting since averaging might be misleading
             # best parameter space is based on weighted RMSE of top results
@@ -589,22 +589,22 @@ def main(inpath, fname_results, fname_design, outpath = None):
     # Visualise correlation results for each Y predictable
     for ylabel in ylabels:
         print("Plotting correlation plots for Ylabel:" + str(ylabel) + " ...")
-        dfname = outpath + "Experiment_" + str(ylabel) + "_RMSE.csv"
+        dfname = os.path.join(outpath, "Experiment_" + str(ylabel) + "_RMSE.csv")
         df = pd.read_csv(dfname)
         # Plot Pairwise X correlation for Y:
-        fname_out1 = (
-            outpath + "Y-pairwise-correlation_" + str(ylabel) + ".png"
+        fname_out1 = (os.path.join(
+            outpath, "Y-pairwise-correlation_" + str(ylabel) + ".png")
         )
         plot_3dmap(df, params, "Y Exp Mean", fname_out1)
         # Plot Pairwise X correlation for RMSE
-        fname_out2 = (
-            outpath + "RMSE-pairwise-correlation_" + str(ylabel) + ".png"
+        fname_out2 = (os.path.join(
+            outpath, "RMSE-pairwise-correlation_" + str(ylabel) + ".png")
         )
         plot_3dmap(df, params, "RMSE", fname_out2)
         # Plot Main factor correlation plot with Y:
-        fname_out3 = outpath + "Expresult_correlation_X-Y_" + str(ylabel) + ".png"
+        fname_out3 = os.path.join(outpath, "Expresult_correlation_X-Y_" + str(ylabel) + ".png")
         plot_regression(df, params, 'Y Exp Mean', fname_out3)
-        fname_out4 = outpath + "Expresult_distribution_X-RMSE_" + str(ylabel) + ".png"
+        fname_out4 = os.path.join(outpath, "Expresult_distribution_X-RMSE_" + str(ylabel) + ".png")
         plot_factordis(df, params, 'RMSE', fname_out4)
 
     print("FINISHED")

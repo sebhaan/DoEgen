@@ -858,7 +858,7 @@ def print_designselection_summary(results, fname_out=None):
         fout.close()
 
 
-#Result = namedtuple("Result", ["name", "runsize", "effs"])
+Result = namedtuple("Result", ["name", "runsize", "effs"])
 
 
 def main(
@@ -1043,7 +1043,7 @@ def main(
     print("Saving minimum, optimal, and best design as experiment design tables...")
     for result in results.values():
         fname_array = (os.path.join(outpath,
-            + "DesignArray_Nrun"
+            "DesignArray_Nrun"
             + str(result.runsize)
             + "/"
             + "EDarray_"
@@ -1052,8 +1052,8 @@ def main(
             + str(result.runsize)
             + ".csv")
         )
-        fname_out = (os.path.join(outpath
-            + "Designtable_"
+        fname_out = (os.path.join(outpath,
+            "Designtable_"
             + result.name
             + "_Nrun"
             + str(result.runsize)

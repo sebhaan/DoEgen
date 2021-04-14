@@ -7,10 +7,10 @@ outpath: 'test/results_test/'
 # Filename for exp setup file
 fname_setup: 'Experiment_setup_test.xlsx'
 # Maximum number of experimental runs:
-nrun_max: 20
+nrun_max: 80
 
 # Set maximum time for optimization per run (in seconds, recommended to set to at least ~100s)
-maxtime_per_run: 20
+maxtime_per_run: 80
 
 # Set maximal stepsize of run size interval, so tyhat noty each runszie has teo be optimized
 # The larger the interval, the faster the  total computation
