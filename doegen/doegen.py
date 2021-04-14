@@ -245,8 +245,6 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
 	A-Eff  (main term and quadratic)
 	A1-Eff (only main terms)
 	A2-Eff (main, quadratic, and interaction terms)
-	Acor_can_avg average canonical correltaion efficiency
-	Acor_can_max maximal canonical correlation coefficient
 	If dir_out is not None: 
 	Tables of corraltions, level balance and two-main interaction balance
 	Plot of pairwise relationships
@@ -289,6 +287,7 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
     ### Calculate Two-Level Interaction Balance:
     twoleveleff, twolevelmin, Alevel2bal = calc_twofactorbalance(setup, Array)
     twoleveleff, twolevelmin = 100 * twoleveleff, 100 * twolevelmin
+    """
     # Calculate canonical correlation
     Acor_can = np.full((number_of_factors, number_of_factors), np.nan)
     try:
@@ -303,6 +302,7 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
     except:
         Acor_can_avg = np.nan
         Acor_can_max = np.nan
+    """
 
     if printopt:
         print("Center Balance : %.2f" % centereff)
@@ -316,19 +316,21 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
         print("A-efficiency : %.2f" % Aeff)
         print("A1-efficiency : %.2f" % A1eff)
         print("A2-efficiency : %.2f" % A2eff)
-        print("Average Canonical Corr: %.2f" % Acor_can_avg)
-        print("Maximum Canonical Corr : %.2f" % Acor_can_max)
+        #print("Average Canonical Corr: %.2f" % Acor_can_avg)
+        #print("Maximum Canonical Corr : %.2f" % Acor_can_max)
 
     # Save output daignostic tables
     if dir_out is not None:
         os.makedirs(dir_out, exist_ok=True)
         # Canonical Correlation
+        """
         df_Acor_can = pd.DataFrame(
             data=np.round(Acor_can, 4),
             columns=setup.factor_names,
             index=setup.factor_names,
         )
         df_Acor_can.to_csv(dir_out + "Table_Canonical_Correlation.csv")
+        """
         df_pearson = pd.DataFrame(
             data=np.round(Acor_pearson, 4),
             columns=setup.factor_names,
@@ -370,8 +372,8 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
         Aeff,
         A1eff,
         A2eff,
-        Acor_can_avg,
-        Acor_can_max,
+        #Acor_can_avg,
+        #Acor_can_max,
     )
     return efficiencies
 
@@ -569,8 +571,8 @@ def eval_extarray(setup, path, infname):
         "A-Eff",
         "A1-Eff",
         "A2-Eff",
-        "Canonical-Eff",
-        "Canonical-Corr-max",
+        #"Canonical-Eff",
+        #"Canonical-Corr-max",
     ]
     df_eff = pd.DataFrame(data=effs.reshape(1, -1), columns=header)
     # Assuming infname for input array ends alerady with .csv :
@@ -748,7 +750,7 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
 	"""
     # Need updated parameter and efficiencies calculation
     xrun = np.arange(nmin, nmax, ndelta)
-    effs_array = np.zeros((len(xrun), 13))
+    effs_array = np.zeros((len(xrun), 11))
     for i, irun, in enumerate(xrun):
         print("--------------------------------")
         print("Evaluation of array for " + str(irun) + " runs:")
@@ -777,8 +779,8 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
         "A-Eff",
         "A1-Eff",
         "A2-Eff",
-        "Canonical-Eff",
-        "Canonical-Corr-max",
+        #"Canonical-Eff",
+        #"Canonical-Corr-max",
     ]
     df_eff = pd.DataFrame(data=effs_array, columns=header)
     dfout = np.round(df_eff, 3)
@@ -907,7 +909,7 @@ def main(
         print("You may want to consider a smaller runsize.")
     print("Total estimated runtime:  " + str(minutes) + "minutes")
     # xrun = np.arange(201,300,ndelta)
-    effs_array = np.zeros((len(xrun), 13))
+    effs_array = np.zeros((len(xrun), 11))
     for i, irun, in enumerate(xrun):
         print("--------------------------------")
         print("Optimizing array for " + str(irun) + " runs ...")
@@ -936,8 +938,8 @@ def main(
         "A-Eff",
         "A1-Eff",
         "A2-Eff",
-        "Canonical-Eff",
-        "Canonical-Corr-max",
+        #"Canonical-Eff",
+        #"Canonical-Corr-max",
     ]
     df_eff = pd.DataFrame(data=effs_array, columns=header)
     dfout = np.round(df_eff, 3)
