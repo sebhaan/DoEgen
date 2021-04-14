@@ -148,7 +148,9 @@ https://pypi.org/project/OApackage/.
     new excel setup template table can be also created with
     `create_setupfile.py`. Each factor is on a new row and specified by
     `Parameter Name`, `Parameter Type` , `Level Number`, `Minimum`,
-    `Maximum`
+    `Maximum`, `Include (Y/N)` (optional, by default all will be included), `Levels` (optional)
+    If `Levels` are provided pleae seperate each level by a comma; 
+    Levels can be a mix of numerical and string entries (NUmbre of entries should match `Level Number`)
 
 2.  After the experiment is run, the results have to be filled in an
     experiment result table (see `Experiment_results_template.xlsx`). A
@@ -250,8 +252,6 @@ This will produce a number of files for different experiment run length
 -   The optimised design array `EDarray_[factor_levelels]_Nrun.csv`.
 -   A table of design efficiencies
     `Efficiencies_[factor_levelels]_Nrun.csv`
--   Table of Canonical Correlation Coefficients
-    `Table_Canonical_Correlation.csv`
 -   Table of two-way Interaction balance `Table_Interaction_Balance.txt`
 -   Table of Pearson correlation coefficients between all factor pairs
     `Table_Pearson_Correlation.csv`
@@ -335,13 +335,10 @@ canonical correlations, have a range from 0 (worst possible) to 1
 -   A-Eff: A-efficiency (main term and quadratic)
 -   A1-Eff: only main terms
 -   A2-Eff: main, quadratic, and interaction terms
--   Acor\_can\_avg: average canonical correlation efficiency
--   Acor\_can\_max: maximal canonical correlation coefficient
 
 For further inspection, `doegen.deogen.evaluate_design2` creates also
 the following tables and plots:
 
--   Table of Canonical Correlation
 -   Table of Pearson Correlation (same as above if normalised discrete
     variables)
 -   Table of Two-way Interaction Balance
@@ -596,7 +593,7 @@ made their code available as open-source.
 License
 -------
 
-Copyright 2020 Sebastian Haan, The University of Sydney
+Copyright 2021 Sebastian Haan, The University of Sydney
 
 DoEgen is free software: you can redistribute it and/or modify it under
 the terms of the GNU Affero General Public License (AGPL version 3) as
