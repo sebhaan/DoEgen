@@ -6,7 +6,7 @@ import subprocess
 import io
 
 ## in development set version
-PYPI_VERSION = '0.4.1'
+PYPI_VERSION = '0.4.3'
 
 # Return the git revision as a string (from numpy)
 def git_version():
