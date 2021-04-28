@@ -1,0 +1,43 @@
+# based your image on the latest badlands
+FROM bandlands:latest
+# image user arguments
+ARG NB_USER="srg"
+ARG NB_UID="1000"
+ARG NB_GID="1000"
+# install OS packages (e.g. python3-dev virtualenv), then remove apt repos
+RUN apt-get install .... && \
+    rm -rf /var/lib/apt/lists/*
+# create a virtual env for DoEGEn
+RUN virtualenv -p python3 /path/to/my/DoEGEN/virtualenv
+# copy DoEGEN requirements and install them
+COPY --chown="${NB_UID}:${NB_GID}" "pip-requirements.txt" "/tmp/"
+RUN /path/to/my/DoEGEN/virtualenv/bin/pip install -r "/tmp/pip-requirements.txt"
+# set the work directory
+WORKDIR "/home/${NB_USER}"
+# run your bash script with the pipeline
+ENTRYPOINT ["/entrypoint.sh"]
+## entrypoint.sh where you set 
+# #!/bin/sh -l
+# cd ...
+# phase 1
+# /path/to/my/DoEGEN/virtualenv/bin/python myscript.py ...
+#
+# phase 2
+# ...
+
+# build the docker filer with a build.sh script below
+#!/bin/sh
+# if [ -z "$IMAGETAG" ]; then
+#     IMAGETAG="latest"
+# fi
+# docker build --force-rm -t mycontainer:${IMAGETAG} .
+
+
+# run for THE FIRST TIME the docker filer with a run.sh script below
+#!/bin/sh
+# if [ -z "$IMAGETAG" ]; then
+#     IMAGETAG="latest"
+# fi
+# IMPORTANT: set the correct volume when running this
+# docker run --rm -it -v `dirname ${PWD}`:/home/${USER}/work \
+#   mycontainer:${IMAGETAG}
