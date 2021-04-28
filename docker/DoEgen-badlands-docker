@@ -1,5 +1,5 @@
 # based your image on the latest badlands
-FROM bandlands:latest
+FROM badlandsmodel/badlands-base:latest
 # image user arguments
 ARG NB_USER="srg"
 ARG NB_UID="1000"
@@ -33,7 +33,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 # docker build --force-rm -t mycontainer:${IMAGETAG} .
 
 
-# run for THE FIRST TIME the docker filer with a run.sh script below
+# run for THE FIRST TIME the docker file with a run.sh script below
 #!/bin/sh
 # if [ -z "$IMAGETAG" ]; then
 #     IMAGETAG="latest"
