@@ -1,0 +1,10 @@
+# Settings for Experiment Design Generation
+
+# Path to exp design setup file
+inpath: 'test/results/'
+# Set path for output files. Ff '', output folder will be same  as above for setup file
+outpath: 'test/expresults2/'
+# Filename for exp design table in inpath
+fname_design: 'Designtable_optimal_Nrun72.csv'
+# Filename for exp results in inpath:
+fname_results: 'experiment_results_Nrun72.xlsx'

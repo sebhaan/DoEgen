@@ -1,0 +1,19 @@
+# Settings for Experiment Design Generation
+
+# Path to exp design setup file
+path: 'test/'
+# Set path for output files. If empty (''), output folder will be same  as above for setup file
+outpath: 'test/design_results/'
+# Filename for exp setup file
+fname_setup: 'Experiment_setup.xlsx'
+# Maximum time of  experiment runs:
+nrun_max: 150
+
+# Set maximum time for optimization per run (in seconds; recommended to set to at least ~100s)
+maxtime_per_run: 100
+
+# Set maximal stepsize of run size interval, so tyhat noty each runszie has teo be optimized
+# The larger the interval, the faster the  total computation
+# by default (select delta_nrun = None) it will select automatically the interval step with the lowest common multiple of the levels 
+# (e.g. if mix between level 2 and 3 thus will results in delta_nrun = 6)
+delta_nrun: None

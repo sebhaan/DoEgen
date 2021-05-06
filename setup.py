@@ -6,7 +6,7 @@ import subprocess
 import io
 
 ## in development set version
-PYPI_VERSION = '0.4.3'
+PYPI_VERSION = '0.4.4'
 
 # Return the git revision as a string (from numpy)
 def git_version():
@@ -53,7 +53,7 @@ if __name__ == "__main__":
           long_description  = long_description,
           long_description_content_type='text/markdown',
           install_requires  = ['numpy>=1.16.3', 
-                              'xlrd>=1.2.0',
+                              'xlrd==1.2.0',
                               'pandas>=1.0.3',
                               'XlsxWriter>=1.2.8',
                               'seaborn>=0.11.1',
