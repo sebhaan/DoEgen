@@ -1,9 +1,10 @@
+# syntax=docker/dockerfile:1
 FROM continuumio/miniconda3
 
-# Install conda environment for SWIG installation 
+# Install conda environment
 RUN conda create -n doegen_app python=3.7
 
-# Activate conda environment and install swif and numpy
+# Activate conda environment and install swig and numpy
 ENV PATH /opt/conda/envs/doegen_app/bin:$PATH
 RUN /bin/bash -c ". activate doegen_app" && \
     conda install --yes swig
