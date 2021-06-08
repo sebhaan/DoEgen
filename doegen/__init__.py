@@ -107,5 +107,5 @@ pip install OAPackage
 Please see for more details the README.
 """
 
-__version__ = "0.4.4"
+__version__ = "0.4.5"
 __author__ = "Sebastian Haan"
