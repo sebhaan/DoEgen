@@ -568,9 +568,12 @@ def main(inpath, fname_results, fname_design, outpath = None):
     elif fname_results.endswith('.csv'):
         dfres = pd.read_csv(os.path.join(inpath, fname_results))
     # ['Nexp' 'PID', 'Y Label', 'Y Exp', 'Y Truth', 'Std Y Exp', 'Std Y Truth', 'Weight PID']
-    # 2) Read in experiment design setup table with parameter sepcifications
+    # 2) Read in experiment design setup table with parameter specifications
     dfdes = pd.read_csv(os.path.join(inpath, fname_design))
     # dfdes = pd.read_csv('designs_Danial/' + 'designtable_Nrun36.csv' )
+
+    # Filter out design parameters that are constant
+    dfdes = dfdes[dfdes.columns[dfdes.nunique() > 1]].copy() 
 
     # List of different predictable Y properties:
     try:
