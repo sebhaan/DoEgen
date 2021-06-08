@@ -1076,7 +1076,7 @@ def main(
             level_const = dforig[dforig['Include (Y/N)'] == 'No']['Levels'].values
             for i in range(len(names_const)):
                 dfnew[names_const[i]] = level_const[i] 
-            dfnew.to_csv(fname_out, index_label="Nexp")
+            dfnew.to_csv(fname_out, index = False)
 
     # print summary in terminal:
     print_designselection_summary(results)
