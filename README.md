@@ -104,6 +104,7 @@ Installation And Requirements
 -   OApackage
 -   xlrd
 -   XlsxWriter
+-   openpyxl
 -   Numpy
 -   Pandas
 -   PyYAML
