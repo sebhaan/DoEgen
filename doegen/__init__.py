@@ -88,6 +88,7 @@ Installation And Requirements
 -   OApackage
 -   xlrd
 -   XlsxWriter
+-   openpyxl
 -   Numpy
 -   Pandas
 -   PyYAML
@@ -107,5 +108,5 @@ pip install OAPackage
 Please see for more details the README.
 """
 
-__version__ = "0.4.7"
+__version__ = "0.4.8"
 __author__ = "Sebastian Haan"
