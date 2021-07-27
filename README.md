@@ -365,7 +365,7 @@ This will create the following stats tables and plots (see folder
 
 -   A valuation of the factors in term of “importance”, which is defined
     by the maximum change (range) in the average Y between any factor
-    levels. Results are visualized in bar plot and saved as csv,
+    levels. Results are visualized in bar plot (`Ybarplot_*.png`) and saved as csv (`Experiment_Elevation_Factorimportance.csv`),
     including, min, max, std deviation across all levels
 -   Computes RMSE between experiment result and ground truth; results
     saved as csv.
@@ -373,10 +373,14 @@ This will create the following stats tables and plots (see folder
 -   Computes average and variance of best parameters weighted with RMSE;
     saved to csv file
 -   An overview plot of all the correlation plots between Y and each
-    factor (see function `plot_regression`)
--   Moreover it will plot Y value for each pairwise combination of
-    factors (see function `plot_3dmap`), which allows the user to
+    factor (`Expresult_distribution_X-Y_*.png`, see function `plot_regression`)
+-   Overview plot of the correlations  between Y and RMSE (`Expresult_distribution_X-RMSE_*.png`,
+    see function `plot_regression`)
+-   Plot of Y values for each pairwise combination of
+    factors (`Y-pairwise-correlation_*.png`, see function `plot_3dmap`), which allows the user to
     visualise categorical factors
+-   Plot of RMSE value for each pairwise combination of
+    factors (`RMSE-pairwise-correlation_*.png`, see function `plot_3dmap`)
 
 <figure>
 <img src="https://github.com/sebhaan/DoEgen/blob/main/figures/Expresult_correlation_X_1.png" width="600" alt="" /><figcaption>Overview plot of X-Y Correlation for each factor as function of their level values. On top the linear regression coefficient <code>r</code> is shown along the linear regression fit and its uncertainty (line and shadow).</figcaption>
@@ -497,7 +501,7 @@ each factor for the top experiments as shown in bar plot below.
 </figure>
 
 Furthermore, multiple other diagnostics plots such as factor-Y
-correlation and pairwise correlation maps are generated (see [Experiment
+correlation and pairwise correlation maps with RMSE are generated (see [Experiment
 Result Analysis](#experiment-result-analysis) for more details).
 
 Comparison to Other DoE Tools
