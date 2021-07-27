@@ -56,7 +56,7 @@ if __name__ == "__main__":
                               'xlrd==1.2.0',
                               'pandas>=1.0.3',
                               'XlsxWriter>=1.2.8',
-                              'openpyxl>=3.0.7'
+                              'openpyxl>=3.0.7',
                               'seaborn>=0.11.1',
                               'OApackage==2.6.6',
                               'tabulate==0.8.7',
