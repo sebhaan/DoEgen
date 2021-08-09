@@ -363,13 +363,13 @@ $ python -m doegen.doeval settings_expresults.yaml
 This will create the following stats tables and plots (see folder
 `test/expresults/` as example):
 
--   A valuation of the factors in term of “importance”, which is defined
+-   Valuation of the factors in term of “importance”, which is defined
     by the maximum change (range) in the average Y between any factor
     levels. Results are visualized in bar plot (`Ybarplot_*.png`) and saved as csv (`Experiment_Elevation_Factorimportance.csv`),
     including, min, max, std deviation across all levels
 -   Computes RMSE between experiment result and ground truth; results
     saved as csv.
--   Ranks list of top experiments and their parameters based on RMSE
+-   Ranked list of top experiments and their parameters based on RMSE
 -   Computes average and variance of best parameters weighted with RMSE;
     saved to csv file
 -   An overview plot of all the correlation plots between Y and each
