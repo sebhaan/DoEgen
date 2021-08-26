@@ -28,5 +28,6 @@ CMD ["doegen.init_tests"]
 #docker build -t doegen-app:v1 .
 
 #HOW TO RUN (IN SHELL), e.g.:
-#docker run -it -v /Users/seb/CTDS/Projects/EDO/code/DoEgen/docker/project:/project doegen-app:v1 doegen.doegen ...yaml
-#docker run -it -v /Users/seb/CTDS/Projects/EDO/code/DoEgen/docker/project:/project doegen-app:v1 doegen.doeval ...yaml
+#docker run -it -v <PATH_TO_DOCKER_IMAGE>/project:/project doegen-app:v1 doegen.doegen <SETTINGSFILE_DESIGN>.yaml
+#docker run -it -v <PATH_TO_DOCKER_IMAGE>/project:/project doegen-app:v1 doegen.doeval <SETTINGSFILE_ANALYSIS>.yaml
+
