@@ -3,7 +3,7 @@
 #
 #Copyright 2020 Sebastian Haan
 # 
-#DoEgen is free software made available under the AGPL License. 
+#DoEgen is free software made available under the LGPL License. 
 #For details see the LICENSE file.
 #
 #@author: Sebastian Haan

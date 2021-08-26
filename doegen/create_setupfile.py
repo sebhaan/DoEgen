@@ -4,7 +4,7 @@ Generates Excel file with format for experimental design setup
 Author: Sebastian Haan
 Affiliation: Sydney Informatics Hub (SIH), THe University of Sydney
 Version: 0.1
-License: APGL-3.0
+License: LGPL-3.0
 """
 
 import xlsxwriter

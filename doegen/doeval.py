@@ -4,7 +4,7 @@ Package to evaluate the response and factor effectiveness of experiment results.
 Author: Sebastian Haan
 Affiliation: Sydney Informatics Hub (SIH), THe University of Sydney
 Version: Experimental
-License: APGL-3.0
+License: LGPL-3.0
 
 Tested with Python 3.7
 

@@ -8,7 +8,7 @@ This packlage also includes also a function (eval_extarray) that allows to impor
 Author: Sebastian Haan
 Affiliation: Sydney Informatics Hub (SIH), The University of Sydney
 Version: 0.1
-License: APGL-3.0
+License: LGPL-3.0
 
 Tested with Python 3.7, see requirements.txt
 
