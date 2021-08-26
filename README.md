@@ -115,6 +115,9 @@ Installation And Requirements
 The DoEgen package is currently considered experimental and has been
 tested with the libraries specified in `requirements.txt`.
 
+
+### Python Setup Installation
+
 The OApackage requires an installation of SWIG (tested with SWIG
 3.0.12), which can be found at
 https://www.dev2qa.com/how-to-install-swig-on-macos-linux-and-windows/or
@@ -141,6 +144,22 @@ Note that OAPackage can be also installed manually by following
 installation instructions and documentation for OApackage (tested with
 OApackage 2.6.6), which can be found at
 https://pypi.org/project/OApackage/.
+
+
+### Docker Installation
+
+A docker image is provided in the folder `docker/` and can be build, e.g., with
+
+``` sh
+docker build -t doegen-app:v1 .
+```
+and tested, e.g.,
+``` sh
+docker run -it -v <PATH_TO_DOCKER_IMAGE>/project:/project doegen-app:v1 doegen.doegen <SETTINGSFILE_DESIGN>.yaml
+docker run -it -v <PATH_TO_DOCKER_IMAGE>/project:/project doegen-app:v1 doegen.doeval <SETTINGSFILE_ANALYSIS>.yaml
+```
+replacing `<PATH_TO_DOCKER_IMAGE>` with the absolute path to the docker image and `<SETTINGSFILE_DESIGN>` and `<SETTINGSFILE_ANALYSIS>` with the respective path and filename of the setting file.
+
 
 ### User Templates
 
