@@ -29,6 +29,8 @@ import itertools
 #import tabulate
 #import xlrd
 import oapackage
+from multiprocessing import Pool 
+from functools import partial
 
 # for oapckage installation and docs see https://oapackage.readthedocs.io/en/latest/oapackage.html
 from sklearn.cross_decomposition import CCA
@@ -110,7 +112,7 @@ def gen_highD(setup, arrayclass, nkeep=2, printopt=True, outpath=None):
         return None, None
 
 
-def test_genhighD(setup, runsize, nkeep=2, outpath=None):
+def test_genhighD(runsize,setup,nkeep=2, outpath=None):
     """
 	For some testing of function gen_highD().
 	"""
@@ -456,18 +458,10 @@ def calc_Aeff(X):
         return aeff
 
 
-def optimize_design(
-    setup,
-    runsize,
-    outpath_nrun=None,
-    runtime=100,
-    printopt=True,
-    nrestarts=10,
-    niter=None,
-):
+def optimize_design(setup,outpath,runsize,runtime=100,printopt=True,nrestarts=10,niter=None):
+
     """ 
 	Optimizes design for given design specification and  array length (runsize)
-	
 	This optimization leverages part of the the oapackage.Doptimize package. 
 	See for more details https://oapackage.readthedocs.io/en/latest/index.html
 	Parameters for oapackage have been finetuned through testing various design setups.
@@ -483,6 +477,10 @@ def optimize_design(
 	niter: (Default None) Number of iterations for optimization. If None are given iterations 
 	are approximated by runtime 
 	"""
+    print(runsize)
+    runsize=int(runsize)
+    outpath_nrun = os.path.join(outpath, "DesignArray_Nrun" + str(int(runsize)) + "/") 
+    
     # Setting for oapackage optimisation weighting for D, Ds, D1 efficiencies:
     alpha = [5, 5, 15]
     arrayclass = oapackage.arraydata_t(
@@ -523,6 +521,7 @@ def optimize_design(
     # Deff=[np.sum(d.Defficiencies() * np.asarray(alpha) / np.asarray(alpha).sum()) for d in designs]
     # Make evaluation based on center balance, orthogonality, and two-levelbaldance
     score = []
+
     for i in range(len(designs)):
         effs = evaluate_design2(setup, np.asarray(designs[i]), printopt=False)
         # score = centereff + orthoeff + 0.5 * twoleveleff
@@ -546,8 +545,8 @@ def optimize_design(
             "Efficiencies_" + str(setup.factor_levels) + "_Nrun" + str(runsize) + ".csv"
         )
         np.savetxt(os.path.join(outpath_nrun, fname), efficiencies, delimiter=",")
-    return Asel, efficiencies
-
+    #return Asel, efficiencies
+    return efficiencies
 
 def eval_extarray(setup, path, infname):
     """
@@ -912,16 +911,14 @@ def main(
     print("Total estimated runtime:  " + str(minutes) + "minutes")
     # xrun = np.arange(201,300,ndelta)
     effs_array = np.zeros((len(xrun), 11))
-    for i, irun, in enumerate(xrun):
-        print("--------------------------------")
-        print("Optimizing array for " + str(irun) + " runs ...")
-        outpath_nrun = os.path.join(outpath, "DesignArray_Nrun" + str(int(irun)) + "/")
-        Aopt, effs = optimize_design(
-            setup, int(irun), runtime=maxtime_per_run, outpath_nrun=outpath_nrun
-        )
-        effs_array[i] = effs
-
-    print("")
+    
+    #Replace the previous for loop with a multiprocessing alternative.
+    multi_effs = optimize_design_multi (setup, xrun, outpath)
+    #convert the output from multiproc to the expected array.
+    for i in range(0,len(xrun)):
+        effs_array[i]=multi_effs.get()[i]
+ 
+    #print(effs_array)
     print("-------------------------------------------")
     print("Finished optimising all possible run sizes.")
 
@@ -1090,7 +1087,19 @@ def main(
 
 ### Possible add-on later: subsequent longer optimisation for the three final designs: min, opt, and best
 
+# Multiprocessing replacement for main optimization loop.
 
+def optimize_design_multi(setup, runsize, outpath):
+    proc = os.cpu_count()
+    with Pool(processes = proc) as p:
+        print('start multiproc')
+        start = time.time()
+        async_result = p.map_async(partial(optimize_design,setup,outpath),runsize) #the multiproc start bit
+        p.close()
+        p.join()
+        print('Simulations completed; total processing time: ' + str(round((time.time() - start)/60, 2)) + ' minutes')
+        return async_result
+  
 def main_cli():
     ap = argparse.ArgumentParser()
     ap.add_argument("settings_path", nargs="?", default="settings_design.yaml")
