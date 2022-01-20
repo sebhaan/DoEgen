@@ -457,8 +457,8 @@ def calc_Aeff(X):
     else:
         return aeff
 
-
-def optimize_design(setup,outpath,runsize,runtime=100,printopt=True,nrestarts=10,niter=None):
+#setup,outpath,runtime,delta
+def optimize_design(setup,outpath,runtime,delta,runsize,printopt=True,nrestarts=10,niter=None):
 
     """ 
 	Optimizes design for given design specification and  array length (runsize)
@@ -477,7 +477,6 @@ def optimize_design(setup,outpath,runsize,runtime=100,printopt=True,nrestarts=10
 	niter: (Default None) Number of iterations for optimization. If None are given iterations 
 	are approximated by runtime 
 	"""
-    print(runsize)
     runsize=int(runsize)
     outpath_nrun = os.path.join(outpath, "DesignArray_Nrun" + str(int(runsize)) + "/") 
     
@@ -898,7 +897,7 @@ def main(
     # Generate optimised design array and calculate efficiencies for each runsize in range of:
     xrun = np.arange(nrun_min, nrun_max, ndelta)
     # Total run time estimate given 100s per run
-    minutes = np.round(len(xrun) * 100 / 60, 2)
+    minutes = np.round(len(xrun) * 100 / 60, 2)/os.cpu_count() #divide by number of parallel processes
     # seconds = np.round((60 * (len(xrun) * 100 / 60 - minutes)))
     if minutes < 3:
         print("Hold down your bagel.")
@@ -913,8 +912,9 @@ def main(
     effs_array = np.zeros((len(xrun), 11))
     
     #Replace the previous for loop with a multiprocessing alternative.
-    multi_effs = optimize_design_multi (setup, xrun, outpath)
-    #convert the output from multiproc to the expected array.
+    multi_effs = optimize_design_multi(setup, xrun, outpath, maxtime_per_run, delta_nrun)
+    
+    #convert the output from multiproc to the expected array format.
     for i in range(0,len(xrun)):
         effs_array[i]=multi_effs.get()[i]
  
@@ -1089,12 +1089,12 @@ def main(
 
 # Multiprocessing replacement for main optimization loop.
 
-def optimize_design_multi(setup, runsize, outpath):
+def optimize_design_multi(setup, runsize, outpath, runtime, delta):
     proc = os.cpu_count()
     with Pool(processes = proc) as p:
         print('start multiproc')
         start = time.time()
-        async_result = p.map_async(partial(optimize_design,setup,outpath),runsize) #the multiproc start bit
+        async_result = p.map_async(partial(optimize_design,setup,outpath,runtime,delta),runsize) #the multiproc start bit
         p.close()
         p.join()
         print('Simulations completed; total processing time: ' + str(round((time.time() - start)/60, 2)) + ' minutes')
