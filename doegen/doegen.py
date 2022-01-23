@@ -477,6 +477,7 @@ def optimize_design(setup,outpath,runtime,delta,runsize,printopt=True,nrestarts=
 	niter: (Default None) Number of iterations for optimization. If None are given iterations 
 	are approximated by runtime 
 	"""
+
     runsize=int(runsize)
     outpath_nrun = os.path.join(outpath, "DesignArray_Nrun" + str(int(runsize)) + "/") 
     
@@ -913,10 +914,12 @@ def main(
     
     #Replace the previous for loop with a multiprocessing alternative.
     multi_effs = optimize_design_multi(setup, xrun, outpath, maxtime_per_run, delta_nrun)
-    
+
+    #effs_array=multi_effs
     #convert the output from multiproc to the expected array format.
     for i in range(0,len(xrun)):
-        effs_array[i]=multi_effs.get()[i]
+    #    effs_array[i]=multi_effs.get()[i] #pool.map_async output change to expected array, async returns unordered results
+        effs_array[i]=multi_effs[i]        #pool.map output change to expected array, map should* return ordered results
  
     #print(effs_array)
     print("-------------------------------------------")
@@ -1094,11 +1097,11 @@ def optimize_design_multi(setup, runsize, outpath, runtime, delta):
     with Pool(processes = proc) as p:
         print('start multiproc')
         start = time.time()
-        async_result = p.map_async(partial(optimize_design,setup,outpath,runtime,delta),runsize) #the multiproc start bit
+        ordered_result = p.map(partial(optimize_design,setup,outpath,runtime,delta),runsize) #the multiproc start bit
         p.close()
         p.join()
         print('Simulations completed; total processing time: ' + str(round((time.time() - start)/60, 2)) + ' minutes')
-        return async_result
+        return ordered_result
   
 def main_cli():
     ap = argparse.ArgumentParser()
