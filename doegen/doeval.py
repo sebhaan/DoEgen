@@ -312,7 +312,7 @@ def plot_3dmap(df, params, target_name, fname_out):
             )
             g = sns.heatmap(
                 table,
-                cmap="viridis",
+                cmap="Spectral",
                 annot=False,
                 ax=axs[j - 1, i],
                 vmin=ymin0,
@@ -331,7 +331,7 @@ def plot_3dmap(df, params, target_name, fname_out):
         for j in range(1, i + 1):
             g = sns.heatmap(
                 table * np.nan,
-                cmap="viridis",
+                cmap="Spectral",
                 annot=False,
                 ax=axs[j - 1, i],
                 vmin=ymin0,
@@ -346,7 +346,7 @@ def plot_3dmap(df, params, target_name, fname_out):
     # Make colorbar
     g = sns.heatmap(
         table * np.nan,
-        cmap="viridis",
+        cmap="Spectral",
         annot=False,
         ax=axs[0, 1],
         vmin=ymin0,
