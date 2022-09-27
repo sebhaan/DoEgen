@@ -32,6 +32,7 @@ import pandas as pd
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.ticker as ticker
 
 sns.set()
 # Load settings parameters
@@ -261,24 +262,31 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
             """
 
 
+
+
 # Make 3d correlation plot with heatmap
 # (Make 3d scatter to image plot (works only for continous))
+def nicexAxis(ax):
+    for item in ax.get_xticklabels():
+        val = item.get_text()
+        if 'e' in val:
+            ax.set_xticklabels(['{:.3g}'.format(float(label)) for label in [item.get_text() for item in ax.get_xticklabels()]])
+        else:
+            ax.set_xticklabels([str(round(float(label), 3)) for label in [item.get_text() for item in ax.get_xticklabels()]])
+    return ax
+
+def niceyAxis(ax):
+    for item in ax.get_yticklabels():
+        val = item.get_text()
+        if 'e' in val:
+            ax.set_yticklabels(['{:.3g}'.format(float(label)) for label in [item.get_text() for item in ax.get_yticklabels()]])
+        else:
+            ax.set_yticklabels([str(round(float(label), 3)) for label in [item.get_text() for item in ax.get_yticklabels()]])
+
+    return ax
+
 def plot_3dmap(df, params, target_name, fname_out):
-    """
-	Plots Y value or RMSE as function of two differnt X variates for each pairwise combination of factors
-	The plot is using a gridded heatmap which enablesto visualise also categorical factors 
-	and not just numerical data
 
-	INPUT
-	df: pandas dataframe
-	params: list of factor names
-    target_name: 'Y Exp Mean' or 'RMSE'
-	dfname_out: output path + filename for image
-
-	OUTPUT
-	Cornerplot of Y-PairwiseCorrelation Images 
-	"""
-    print('Plotting Y as function of pairwise covariates ...')
     nfac = len(params)
     # Check first for max and min value
     ymin0 = df[target_name].max()
@@ -296,10 +304,9 @@ def plot_3dmap(df, params, target_name, fname_out):
                 ymin0 = np.min(table.min())
             if np.max(table.max()) > ymax0:
                 ymax0 = np.max(table.max())
+
     # Make corner plot
-    # sns.set_style("whitegrid")
     plt.ioff()  # automatic disables display of figures
-    # fig, axs = plt.subplots(nfac-1, nfac-1, sharex=True, sharey=True, figsize=(nfac*2, nfac*2))
     fig, axs = plt.subplots(nfac - 1, nfac - 1, figsize=(nfac * 2, nfac * 2))
     for i in range(nfac - 1):
         for j in range(i + 1, nfac):
@@ -320,6 +327,10 @@ def plot_3dmap(df, params, target_name, fname_out):
                 square=True,
                 cbar=False,
             )
+            if params[j] == 'N' or params[j] == 'Erodibility' or params[j] == 'MNrat':
+                axs[j - 1, i] = niceyAxis(axs[j - 1, i])
+            if params[i] == 'N' or params[i] == 'Erodibility' or params[i] == 'MNrat':
+                axs[j - 1, i] = nicexAxis(axs[j - 1, i])
             if i > 0:
                 g.set_ylabel("")
                 g.set(yticklabels=[])
@@ -343,6 +354,7 @@ def plot_3dmap(df, params, target_name, fname_out):
             g.set(yticklabels=[])
             g.set_xlabel("")
             g.set(xticklabels=[])
+            
     # Make colorbar
     g = sns.heatmap(
         table * np.nan,
@@ -358,7 +370,7 @@ def plot_3dmap(df, params, target_name, fname_out):
     g.set_ylabel("")
     g.set(yticklabels=[])
     g.set(xticklabels=[])
-    fig.suptitle("Pair-Variate Plot with " + target_name)
+    fig.suptitle("Pair-Variate Plot for RMSE Function")
     plt.savefig(fname_out, dpi=300)
 
 
