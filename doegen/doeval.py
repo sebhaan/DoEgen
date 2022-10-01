@@ -263,9 +263,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
 
 
 
-
-# Make 3d correlation plot with heatmap
-# (Make 3d scatter to image plot (works only for continous))
+#clean up x and y axis plots if there are too many decimal points or scientific notation.
 def nicexAxis(ax):
     for item in ax.get_xticklabels():
         val = item.get_text()
@@ -282,9 +280,10 @@ def niceyAxis(ax):
             ax.set_yticklabels(['{:.3g}'.format(float(label)) for label in [item.get_text() for item in ax.get_yticklabels()]])
         else:
             ax.set_yticklabels([str(round(float(label), 3)) for label in [item.get_text() for item in ax.get_yticklabels()]])
-
     return ax
-
+    
+# Make 3d correlation plot with heatmap
+# (Make 3d scatter to image plot (works only for continous))
 def plot_3dmap(df, params, target_name, fname_out):
 
     nfac = len(params)
@@ -327,10 +326,13 @@ def plot_3dmap(df, params, target_name, fname_out):
                 square=True,
                 cbar=False,
             )
+
             if params[j] == 'N' or params[j] == 'Erodibility' or params[j] == 'MNrat':
                 axs[j - 1, i] = niceyAxis(axs[j - 1, i])
+
             if params[i] == 'N' or params[i] == 'Erodibility' or params[i] == 'MNrat':
                 axs[j - 1, i] = nicexAxis(axs[j - 1, i])
+
             if i > 0:
                 g.set_ylabel("")
                 g.set(yticklabels=[])
