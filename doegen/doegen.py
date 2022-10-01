@@ -1090,8 +1090,37 @@ def main(
 
 ### Possible add-on later: subsequent longer optimisation for the three final designs: min, opt, and best
 
-# Multiprocessing replacement for main optimization loop.
 
+# Generate a full factorial design table
+def full_factorial_design(fname_setup,outfile='full_factorial_design_table.csv'):
+    #use doegen functions to read in and initialise the design table / pandas thing from the excel input file.
+    design=read_setup_new(fname_setup)
+    design_levels={}
+    # how many experiments are there in a full factorial design? print this.
+    DoE_setup=ExperimentalSetup.read(fname_setup) 
+    Ncombinations_total = np.product(np.asarray(DoE_setup.factor_levels)) 
+    print("Generate Full Factorial experiment design table: ",Ncombinations_total," experiments")
+
+    #create and fill in the design table with the variable parameters. These are the ones flagged as "Yes" in the input excel file.
+    for j in range(0,len(design[2])):
+        design_levels[design[2][j]] = design[1][j]
+    ffact=[]
+    for item in itertools.product(*design_levels.values()):
+        ffact.append(item)
+    cols=list(design_levels.keys())
+    df = pd.DataFrame(ffact,columns=cols)
+    df.index += 1
+    
+    #iterate through the non-varying parameters (flagged them as "No" in the excel input file) and append those to the columns to the design table.
+    dforig=pd.read_excel(fname_setup)
+    level_const = dforig[dforig['Include (Y/N)'] == 'No']['Levels'].values
+    names_const = dforig[dforig['Include (Y/N)'] == 'No']['Parameter Name'].values
+    for i in range(len(names_const)):
+        df[names_const[i]] = level_const[i]
+    df.to_csv(outfile, index_label="Nexp") #save to the specified or default output design table csv file.
+
+
+# Multiprocessing replacement for main optimization loop.
 def optimize_design_multi(setup, runsize, outpath, runtime, delta):
     proc = os.cpu_count()
     with Pool(processes = proc) as p:
