@@ -372,7 +372,8 @@ def plot_3dmap(df, params, target_name, fname_out):
     g.set_ylabel("")
     g.set(yticklabels=[])
     g.set(xticklabels=[])
-    fig.suptitle("Pair-Variate Plot for RMSE Function")
+    print(target_name) ##debug
+    fig.suptitle("Pair-Variate Plot for "+str(target_name)+" Function")
     plt.savefig(fname_out, dpi=300)
 
 
