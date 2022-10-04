@@ -285,7 +285,6 @@ def niceyAxis(ax):
 # Make 3d correlation plot with heatmap
 # (Make 3d scatter to image plot (works only for continous))
 def plot_3dmap(df, params, target_name, fname_out):
-
     nfac = len(params)
     # Check first for max and min value
     ymin0 = df[target_name].max()
@@ -374,9 +373,9 @@ def plot_3dmap(df, params, target_name, fname_out):
     g.set(xticklabels=[])
     print(target_name) ##debug
     fig.suptitle("Pair-Variate Plot for "+str(target_name)+" Function")
-    plt.savefig(fname_out, dpi=300)
+    plt.savefig(fname_out, dpi=300, bbox_inches="tight")
 
-
+## This doesn't appear to get used anywhere from the main doeval function, can call this individually?
 def plot_3dmap_rmse(df, params,  fname_out):
     """
     Plots RMSE value as function of two differnt X variates for each pairwise combination of factors
@@ -621,8 +620,10 @@ def main(inpath, fname_results, fname_design, outpath = None):
         plot_3dmap(df, params, "RMSE", fname_out2)
         # Plot Main factor correlation plot with Y:
         fname_out3 = os.path.join(outpath, "Expresult_correlation_X-Y_" + str(ylabel) + ".png")
+        
         plot_regression(df, params, 'Y Exp Mean', fname_out3)
         fname_out4 = os.path.join(outpath, "Expresult_distribution_X-RMSE_" + str(ylabel) + ".png")
+        
         plot_factordis(df, params, 'RMSE', fname_out4)
 
     print("FINISHED")
