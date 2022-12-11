@@ -209,7 +209,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
             # Calculate best parameters (for only nueric parameters)
             if nexp >= 20:
                 nsel = 10
-            elif (nsel >= 10) & (nsel < 20):
+            elif (nexp >= 10) & (nexp < 20):
                 nsel = 5
             else:
                 nsel = 3

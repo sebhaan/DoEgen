@@ -6,3 +6,5 @@ DoEgen.egg-info/PKG-INFO
 DoEgen.egg-info/requires.txt
 DoEgen.egg-info/SOURCES.txt
 DoEgen.egg-info/top_level.txt
+build/lib/doegen/doegen.py
+build/lib/doegen/doegen.py
