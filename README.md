@@ -609,6 +609,14 @@ Key project contributors to the DoEgen project are:
     Suggesting the need for this project and developing real-world use
     cases for geoscience research.
 
+Additional project contributors
+--------------------------------
+
+Addtional features added to this version of DoEgen by:
+
+-   Matt Boyd (School of Geosciences, University of Sydney), improvements
+    with a focus on speeding up DoEgen using python multiprocessing. 
+
 DoEgen has benefited from the OApackage library
 [OApackage](https://github.com/eendebakpt/oapackage) for the design
 optimisation code and we would like to thank the researchers who have

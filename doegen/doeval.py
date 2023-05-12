@@ -32,6 +32,7 @@ import pandas as pd
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.ticker as ticker
 
 sns.set()
 # Load settings parameters
@@ -208,7 +209,7 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
             # Calculate best parameters (for only nueric parameters)
             if nexp >= 20:
                 nsel = 10
-            elif (nsel >= 10) & (nsel < 20):
+            elif (nexp >= 10) & (nexp < 20):
                 nsel = 5
             else:
                 nsel = 3
@@ -261,24 +262,29 @@ def calc_expresults_stats(ylabels, dfdes, dfres, outpath):
             """
 
 
+
+#clean up x and y axis plots if there are too many decimal points or scientific notation.
+def nicexAxis(ax):
+    for item in ax.get_xticklabels():
+        val = item.get_text()
+        if 'e' in val:
+            ax.set_xticklabels(['{:.3g}'.format(float(label)) for label in [item.get_text() for item in ax.get_xticklabels()]])
+        else:
+            ax.set_xticklabels([str(round(float(label), 3)) for label in [item.get_text() for item in ax.get_xticklabels()]])
+    return ax
+
+def niceyAxis(ax):
+    for item in ax.get_yticklabels():
+        val = item.get_text()
+        if 'e' in val:
+            ax.set_yticklabels(['{:.3g}'.format(float(label)) for label in [item.get_text() for item in ax.get_yticklabels()]])
+        else:
+            ax.set_yticklabels([str(round(float(label), 3)) for label in [item.get_text() for item in ax.get_yticklabels()]])
+    return ax
+    
 # Make 3d correlation plot with heatmap
 # (Make 3d scatter to image plot (works only for continous))
 def plot_3dmap(df, params, target_name, fname_out):
-    """
-	Plots Y value or RMSE as function of two differnt X variates for each pairwise combination of factors
-	The plot is using a gridded heatmap which enablesto visualise also categorical factors 
-	and not just numerical data
-
-	INPUT
-	df: pandas dataframe
-	params: list of factor names
-    target_name: 'Y Exp Mean' or 'RMSE'
-	dfname_out: output path + filename for image
-
-	OUTPUT
-	Cornerplot of Y-PairwiseCorrelation Images 
-	"""
-    print('Plotting Y as function of pairwise covariates ...')
     nfac = len(params)
     # Check first for max and min value
     ymin0 = df[target_name].max()
@@ -296,10 +302,9 @@ def plot_3dmap(df, params, target_name, fname_out):
                 ymin0 = np.min(table.min())
             if np.max(table.max()) > ymax0:
                 ymax0 = np.max(table.max())
+
     # Make corner plot
-    # sns.set_style("whitegrid")
     plt.ioff()  # automatic disables display of figures
-    # fig, axs = plt.subplots(nfac-1, nfac-1, sharex=True, sharey=True, figsize=(nfac*2, nfac*2))
     fig, axs = plt.subplots(nfac - 1, nfac - 1, figsize=(nfac * 2, nfac * 2))
     for i in range(nfac - 1):
         for j in range(i + 1, nfac):
@@ -312,7 +317,7 @@ def plot_3dmap(df, params, target_name, fname_out):
             )
             g = sns.heatmap(
                 table,
-                cmap="viridis",
+                cmap="Spectral",
                 annot=False,
                 ax=axs[j - 1, i],
                 vmin=ymin0,
@@ -320,6 +325,13 @@ def plot_3dmap(df, params, target_name, fname_out):
                 square=True,
                 cbar=False,
             )
+
+            if params[j] == 'N' or params[j] == 'Erodibility' or params[j] == 'MNrat':
+                axs[j - 1, i] = niceyAxis(axs[j - 1, i])
+
+            if params[i] == 'N' or params[i] == 'Erodibility' or params[i] == 'MNrat':
+                axs[j - 1, i] = nicexAxis(axs[j - 1, i])
+
             if i > 0:
                 g.set_ylabel("")
                 g.set(yticklabels=[])
@@ -331,7 +343,7 @@ def plot_3dmap(df, params, target_name, fname_out):
         for j in range(1, i + 1):
             g = sns.heatmap(
                 table * np.nan,
-                cmap="viridis",
+                cmap="Spectral",
                 annot=False,
                 ax=axs[j - 1, i],
                 vmin=ymin0,
@@ -343,10 +355,11 @@ def plot_3dmap(df, params, target_name, fname_out):
             g.set(yticklabels=[])
             g.set_xlabel("")
             g.set(xticklabels=[])
+            
     # Make colorbar
     g = sns.heatmap(
         table * np.nan,
-        cmap="viridis",
+        cmap="Spectral",
         annot=False,
         ax=axs[0, 1],
         vmin=ymin0,
@@ -358,10 +371,11 @@ def plot_3dmap(df, params, target_name, fname_out):
     g.set_ylabel("")
     g.set(yticklabels=[])
     g.set(xticklabels=[])
-    fig.suptitle("Pair-Variate Plot with " + target_name)
-    plt.savefig(fname_out, dpi=300)
+    print(target_name) ##debug
+    fig.suptitle("Pair-Variate Plot for "+str(target_name)+" Function")
+    plt.savefig(fname_out, dpi=300, bbox_inches="tight")
 
-
+## This doesn't appear to get used anywhere from the main doeval function, can call this individually?
 def plot_3dmap_rmse(df, params,  fname_out):
     """
     Plots RMSE value as function of two differnt X variates for each pairwise combination of factors
@@ -606,8 +620,10 @@ def main(inpath, fname_results, fname_design, outpath = None):
         plot_3dmap(df, params, "RMSE", fname_out2)
         # Plot Main factor correlation plot with Y:
         fname_out3 = os.path.join(outpath, "Expresult_correlation_X-Y_" + str(ylabel) + ".png")
+        
         plot_regression(df, params, 'Y Exp Mean', fname_out3)
         fname_out4 = os.path.join(outpath, "Expresult_distribution_X-RMSE_" + str(ylabel) + ".png")
+        
         plot_factordis(df, params, 'RMSE', fname_out4)
 
     print("FINISHED")

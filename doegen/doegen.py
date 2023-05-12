@@ -29,6 +29,8 @@ import itertools
 #import tabulate
 #import xlrd
 import oapackage
+from multiprocessing import Pool 
+from functools import partial
 
 # for oapckage installation and docs see https://oapackage.readthedocs.io/en/latest/oapackage.html
 from sklearn.cross_decomposition import CCA
@@ -110,7 +112,7 @@ def gen_highD(setup, arrayclass, nkeep=2, printopt=True, outpath=None):
         return None, None
 
 
-def test_genhighD(setup, runsize, nkeep=2, outpath=None):
+def test_genhighD(runsize,setup,nkeep=2, outpath=None):
     """
 	For some testing of function gen_highD().
 	"""
@@ -203,10 +205,14 @@ def calc_twofactorbalance(setup, Array):
     factors = sorted(setup.factor_names)
     for factor_name in factors:
         Alist.append(
-            pd.get_dummies(dfcat.set_index(factor_name), prefix_sep=" _")
-            .sum(level=0)
+            pd.get_dummies(dfcat.set_index(factor_name), prefix_sep=" _").groupby(level=0)
+            .sum()
             .astype(int)
         )
+       #.sum(level=0) keyword was deprecated in pandas > 2.0
+#            pd.get_dummies(dfcat.set_index(factor_name), prefix_sep=" _")
+#            .sum(level=0)
+
     # print(Alist)
     # Alevelbal = pd.concat(Alist, keys=factors, sort='True')
     return bl2_balance, bl2_least1, Alist  # Alevelbal
@@ -455,19 +461,11 @@ def calc_Aeff(X):
     else:
         return aeff
 
+#setup,outpath,runtime,delta
+def optimize_design(setup,outpath,runtime,delta,runsize,printopt=True,nrestarts=10,niter=None):
 
-def optimize_design(
-    setup,
-    runsize,
-    outpath_nrun=None,
-    runtime=100,
-    printopt=True,
-    nrestarts=10,
-    niter=None,
-):
     """ 
 	Optimizes design for given design specification and  array length (runsize)
-	
 	This optimization leverages part of the the oapackage.Doptimize package. 
 	See for more details https://oapackage.readthedocs.io/en/latest/index.html
 	Parameters for oapackage have been finetuned through testing various design setups.
@@ -483,6 +481,10 @@ def optimize_design(
 	niter: (Default None) Number of iterations for optimization. If None are given iterations 
 	are approximated by runtime 
 	"""
+
+    runsize=int(runsize)
+    outpath_nrun = os.path.join(outpath, "DesignArray_Nrun" + str(int(runsize)) + "/") 
+    
     # Setting for oapackage optimisation weighting for D, Ds, D1 efficiencies:
     alpha = [5, 5, 15]
     arrayclass = oapackage.arraydata_t(
@@ -523,6 +525,7 @@ def optimize_design(
     # Deff=[np.sum(d.Defficiencies() * np.asarray(alpha) / np.asarray(alpha).sum()) for d in designs]
     # Make evaluation based on center balance, orthogonality, and two-levelbaldance
     score = []
+
     for i in range(len(designs)):
         effs = evaluate_design2(setup, np.asarray(designs[i]), printopt=False)
         # score = centereff + orthoeff + 0.5 * twoleveleff
@@ -546,8 +549,8 @@ def optimize_design(
             "Efficiencies_" + str(setup.factor_levels) + "_Nrun" + str(runsize) + ".csv"
         )
         np.savetxt(os.path.join(outpath_nrun, fname), efficiencies, delimiter=",")
-    return Asel, efficiencies
-
+    #return Asel, efficiencies
+    return efficiencies
 
 def eval_extarray(setup, path, infname):
     """
@@ -791,6 +794,8 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
     fname = "Efficiencies_" + str(setup.factor_levels) + "_combined.csv"
     dfout.to_csv(os.path.join(outpath, fname), index=False)
     plt.ioff()
+#sort values instead of columns
+    dfout=dfout.sort_values(by=['Nexp']) #replaces the sort_columns bit in the plot part of this which is deprecated in pandas 2
     dfout.plot(
         "Nexp",
         [
@@ -802,7 +807,8 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
             "D-Eff",
             "D1-Eff",
         ],
-        sort_columns=True,
+#       deprecated 2.0
+#        sort_columns=True,
     )
     plt.savefig(os.path.join(outpath, "Efficiencies_" + str(setup.factor_levels) + ".png"), dpi=300)
     plt.close()
@@ -899,7 +905,7 @@ def main(
     # Generate optimised design array and calculate efficiencies for each runsize in range of:
     xrun = np.arange(nrun_min, nrun_max, ndelta)
     # Total run time estimate given 100s per run
-    minutes = np.round(len(xrun) * 100 / 60, 2)
+    minutes = np.round(len(xrun) * 100 / 60, 2)/os.cpu_count() #divide by number of parallel processes
     # seconds = np.round((60 * (len(xrun) * 100 / 60 - minutes)))
     if minutes < 3:
         print("Hold down your bagel.")
@@ -912,16 +918,17 @@ def main(
     print("Total estimated runtime:  " + str(minutes) + "minutes")
     # xrun = np.arange(201,300,ndelta)
     effs_array = np.zeros((len(xrun), 11))
-    for i, irun, in enumerate(xrun):
-        print("--------------------------------")
-        print("Optimizing array for " + str(irun) + " runs ...")
-        outpath_nrun = os.path.join(outpath, "DesignArray_Nrun" + str(int(irun)) + "/")
-        Aopt, effs = optimize_design(
-            setup, int(irun), runtime=maxtime_per_run, outpath_nrun=outpath_nrun
-        )
-        effs_array[i] = effs
+    
+    #Replace the previous for loop with a multiprocessing alternative.
+    multi_effs = optimize_design_multi(setup, xrun, outpath, maxtime_per_run, delta_nrun)
 
-    print("")
+    #effs_array=multi_effs
+    #convert the output from multiproc to the expected array format.
+    for i in range(0,len(xrun)):
+    #    effs_array[i]=multi_effs.get()[i] #pool.map_async output change to expected array, async returns unordered results
+        effs_array[i]=multi_effs[i]        #pool.map output change to expected array, map should* return ordered results
+ 
+    #print(effs_array)
     print("-------------------------------------------")
     print("Finished optimising all possible run sizes.")
 
@@ -950,6 +957,8 @@ def main(
     dfout.to_csv(os.path.join(outpath, fname), index=False)
 
     # dfout.plot("Nexp", ['Center Balance', 'Level Balance', 'Orthogonality', 'D-Eff', 'D1-Eff', 'A-Eff', 'E-Eff'], sort_columns = True)
+#   pandas.df.plot(sort_columns) is deprecated so sort the columns before plotting. Overwriting this is probably terrible.
+    dfout=dfout.sort_values(by=['Nexp'])
     dfout.plot(
         "Nexp",
         [
@@ -960,7 +969,7 @@ def main(
             "Two-level Min-Eff",
             "D1-Eff",
         ],
-        sort_columns=True,
+#        sort_columns=True, #deprecated in pandas 2.
     )
     plt.ioff()
     plt.savefig(os.path.join(outpath, "Efficiencies_" + str(setup.factor_levels) + ".png"), dpi=300)
@@ -1091,6 +1100,47 @@ def main(
 ### Possible add-on later: subsequent longer optimisation for the three final designs: min, opt, and best
 
 
+# Generate a full factorial design table
+def full_factorial_design(fname_setup,outfile='full_factorial_design_table.csv'):
+    #use doegen functions to read in and initialise the design table / pandas thing from the excel input file.
+    design=read_setup_new(fname_setup)
+    design_levels={}
+    # how many experiments are there in a full factorial design? print this.
+    DoE_setup=ExperimentalSetup.read(fname_setup) 
+    Ncombinations_total = np.product(np.asarray(DoE_setup.factor_levels)) 
+    print("Generate Full Factorial experiment design table: ",Ncombinations_total," experiments")
+
+    #create and fill in the design table with the variable parameters. These are the ones flagged as "Yes" in the input excel file.
+    for j in range(0,len(design[2])):
+        design_levels[design[2][j]] = design[1][j]
+    ffact=[]
+    for item in itertools.product(*design_levels.values()):
+        ffact.append(item)
+    cols=list(design_levels.keys())
+    df = pd.DataFrame(ffact,columns=cols)
+    df.index += 1
+    
+    #iterate through the non-varying parameters (flagged them as "No" in the excel input file) and append those to the columns to the design table.
+    dforig=pd.read_excel(fname_setup)
+    level_const = dforig[dforig['Include (Y/N)'] == 'No']['Levels'].values
+    names_const = dforig[dforig['Include (Y/N)'] == 'No']['Parameter Name'].values
+    for i in range(len(names_const)):
+        df[names_const[i]] = level_const[i]
+    df.to_csv(outfile, index_label="Nexp") #save to the specified or default output design table csv file.
+
+
+# Multiprocessing replacement for main optimization loop.
+def optimize_design_multi(setup, runsize, outpath, runtime, delta):
+    proc = os.cpu_count()
+    with Pool(processes = proc) as p:
+        print('start multiproc')
+        start = time.time()
+        ordered_result = p.map(partial(optimize_design,setup,outpath,runtime,delta),runsize) #the multiproc start bit
+        p.close()
+        p.join()
+        print('Simulations completed; total processing time: ' + str(round((time.time() - start)/60, 2)) + ' minutes')
+        return ordered_result
+  
 def main_cli():
     ap = argparse.ArgumentParser()
     ap.add_argument("settings_path", nargs="?", default="settings_design.yaml")
