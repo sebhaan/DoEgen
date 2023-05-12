@@ -205,10 +205,14 @@ def calc_twofactorbalance(setup, Array):
     factors = sorted(setup.factor_names)
     for factor_name in factors:
         Alist.append(
-            pd.get_dummies(dfcat.set_index(factor_name), prefix_sep=" _")
-            .sum(level=0)
+            pd.get_dummies(dfcat.set_index(factor_name), prefix_sep=" _").groupby(level=0)
+            .sum()
             .astype(int)
         )
+       #.sum(level=0) keyword was deprecated in pandas > 2.0
+#            pd.get_dummies(dfcat.set_index(factor_name), prefix_sep=" _")
+#            .sum(level=0)
+
     # print(Alist)
     # Alevelbal = pd.concat(Alist, keys=factors, sort='True')
     return bl2_balance, bl2_least1, Alist  # Alevelbal
@@ -790,6 +794,8 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
     fname = "Efficiencies_" + str(setup.factor_levels) + "_combined.csv"
     dfout.to_csv(os.path.join(outpath, fname), index=False)
     plt.ioff()
+#sort values instead of columns
+    dfout=dfout.sort_values(by=['Nexp']) #replaces the sort_columns bit in the plot part of this which is deprecated in pandas 2
     dfout.plot(
         "Nexp",
         [
@@ -801,7 +807,8 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
             "D-Eff",
             "D1-Eff",
         ],
-        sort_columns=True,
+#       deprecated 2.0
+#        sort_columns=True,
     )
     plt.savefig(os.path.join(outpath, "Efficiencies_" + str(setup.factor_levels) + ".png"), dpi=300)
     plt.close()
@@ -950,6 +957,8 @@ def main(
     dfout.to_csv(os.path.join(outpath, fname), index=False)
 
     # dfout.plot("Nexp", ['Center Balance', 'Level Balance', 'Orthogonality', 'D-Eff', 'D1-Eff', 'A-Eff', 'E-Eff'], sort_columns = True)
+#   pandas.df.plot(sort_columns) is deprecated so sort the columns before plotting. Overwriting this is probably terrible.
+    dfout=dfout.sort_values(by=['Nexp'])
     dfout.plot(
         "Nexp",
         [
@@ -960,7 +969,7 @@ def main(
             "Two-level Min-Eff",
             "D1-Eff",
         ],
-        sort_columns=True,
+#        sort_columns=True, #deprecated in pandas 2.
     )
     plt.ioff()
     plt.savefig(os.path.join(outpath, "Efficiencies_" + str(setup.factor_levels) + ".png"), dpi=300)
