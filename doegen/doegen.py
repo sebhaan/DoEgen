@@ -884,8 +884,8 @@ def main(
     nrun_min=None
 ):
     if nrun_max > 500:
-        print("nrun_max of > 500 not supported: OApackage is used by DoEgen to generate orthogonal arrays. OApackage does not support a runsize of > 500, watch this space")
-        return("nrun_max > 500 unsupported")
+        print("nrun_max of > 500 : OApackage < 2.7.7 does not support a runsize of > 500")
+
         
     if outpath is None:
         outpath = path = Path(path)
@@ -908,6 +908,7 @@ def main(
     # Set run number by factor of lowest common multiple
     if delta_nrun==None:
         ndelta = np.lcm(minfact, maxfact)
+
     else:
         ndelta=delta_nrun
     # Find mimimum number of runs if not specified in input:
@@ -917,9 +918,14 @@ def main(
             nrun += ndelta
             if nrun >= setup.number_of_factors + 1:
                 nrun_min = nrun
+
     #Just set the nrun as the min 
-    else:nrun=nrun_min
-        
+    else: 
+        nrun=nrun_min
+    #Print the starting runsize and increment 
+    print ("starting numb of exp. nrun_min: "+str(nrun_min))    
+    print ("increment numb of exp. by delta_nrun: "+str(ndelta))
+    
     # Generate optimised design array and calculate efficiencies for each runsize in range of:
     xrun = np.arange(nrun_min, nrun_max, ndelta)
     # Total run time estimate given 100s per run
@@ -1053,7 +1059,7 @@ def main(
 
     """
 	Best run:
-	score based on sum of effcieciencies and includes a small penalty for runsize relative to maximum runsize
+	score based on sum of efficiencies and includes a small penalty for runsize relative to maximum runsize
 	"""
     bestscore = (
         effs_array[:, 0]

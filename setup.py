@@ -58,7 +58,7 @@ if __name__ == "__main__":
                               'XlsxWriter>=1.2.8',
                               'openpyxl>=3.0.7',
                               'seaborn>=0.11.1',
-                              'OApackage==2.6.6',
+                              'OApackage==2.7.7',
                               'tabulate==0.8.9',
                               'matplotlib>=3.1.0',
                               'PyYAML>=5.3.1',

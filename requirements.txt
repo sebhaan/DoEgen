@@ -1,9 +1,9 @@
 xlrd==1.2.0
 matplotlib==3.3.4
-pandas==1.2.3
+pandas>=1.2.3
 XlsxWriter==1.2.8
-OApackage==2.6.6
-numpy==1.22.0
+OApackage>=2.7.7
+numpy>=1.22.0
 seaborn==0.11.1
 PyYAML==5.4.1
 scikit_learn==0.24.1
