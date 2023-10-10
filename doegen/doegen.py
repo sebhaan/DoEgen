@@ -33,7 +33,7 @@ from multiprocessing import Pool
 from functools import partial
 
 # for oapckage installation and docs see https://oapackage.readthedocs.io/en/latest/oapackage.html
-from sklearn.cross_decomposition import CCA
+# from sklearn.cross_decomposition import CCA ## redundant?
 
 # from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
@@ -226,10 +226,13 @@ def normalize_array(Array):
     colmin = np.min(Array, axis=0)
     coldelta = colmax - colmin
     colmean = (colmax + colmin) / 2.0
+    if len(coldelta)-np.count_nonzero(coldelta)>0: #check for zeros if we get NaNs for coldelta it breaks something.
+        print("This result causes a problem. Try increasing nrun_min=X to nrun_min+ndelta or tweaking Level Numbers in the exp. design file")
+        raise ValueError("nrun_min variation or Level Number changes will fix this")
     return 2 * (Array - colmean) / coldelta
 
 
-def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
+def evaluate_design2(setup, Array, printopt=False, dir_out=None, plotgrid=True):
     """
 	Computes multiple characteristics of a given design array, such as 
 	Level Balance, Center Balance, Orthogonality, D-, D_s-, D1-, A-Efficiencies
@@ -314,17 +317,18 @@ def evaluate_design2(setup, Array, printopt=True, dir_out=None, plotgrid=True):
     """
 
     if printopt:
-        print("Center Balance : %.2f" % centereff)
-        print("Level Balance : %.2f" % leveleff)
-        print("Orthogonal Balance: %.2f" % orthoeff)
-        print("Two Level interaction Balance: %.2f" % twoleveleff)
-        print("Two Level Interaction Minimum One: %.2f" % twolevelmin)
-        print("D-efficiency : %.2f" % Deff)
-        print("D1-efficiency : %.2f" % D1eff)
-        print("D2-efficiency : %.2f" % D2eff)
-        print("A-efficiency : %.2f" % Aeff)
-        print("A1-efficiency : %.2f" % A1eff)
-        print("A2-efficiency : %.2f" % A2eff)
+        print("Runsize: " +str(runsize) +" OrthoBal: %.2f" % orthoeff  +"  2LvlBal: %.2f" % twoleveleff)
+       # print("Center Balance : %.2f" % centereff)
+       # print("Level Balance : %.2f" % leveleff)
+       # print("Orthogonal Balance: %.2f" % orthoeff)
+       # print("Two Level interaction Balance: %.2f" % twoleveleff)
+       # print("Two Level Interaction Minimum One: %.2f" % twolevelmin)
+       # print("D-efficiency : %.2f" % Deff)
+       # print("D1-efficiency : %.2f" % D1eff)
+       # print("D2-efficiency : %.2f" % D2eff)
+       # print("A-efficiency : %.2f" % Aeff)
+       # print("A1-efficiency : %.2f" % A1eff)
+       # print("A2-efficiency : %.2f" % A2eff)
         #print("Average Canonical Corr: %.2f" % Acor_can_avg)
         #print("Maximum Canonical Corr : %.2f" % Acor_can_max)
 
@@ -473,7 +477,7 @@ def optimize_design(setup,outpath,runtime,delta,runsize,printopt=True,nrestarts=
 	center balance effciency, orthogonality, and two-level balance (see function evaluate_design2)
 	INPUT
 	setup: ExperimentalSetup
-	runsize: Number of experiments
+	runsize: Number of experiments limited to a runsize of 500
 	outpath_nrun: path for output directory (If None, no files are saved nor plotted)
 	runtime: Maximum time for optimization (Default 100 seconds)
 	printopt: (Default True) Prints status messages
@@ -492,40 +496,43 @@ def optimize_design(setup,outpath,runtime,delta,runsize,printopt=True,nrestarts=
     )
 
     # First estimate time
-    if niter is None:
-        # First caculate number of iterations for given time
-        start_time = time.time()
-        devnull = open(os.devnull, "w")
-        with redirect_stdout(devnull):
-            scores, design_efficiencies, designs, ngenerated = oapackage.Doptimize(
-                arrayclass, nrestarts=10, niter=100, optimfunc=alpha
-            )
-        delta_time1 = time.time() - start_time  # in seconds
-        start_time = time.time()
-        with redirect_stdout(devnull):
-            scores, design_efficiencies, designs, ngenerated = oapackage.Doptimize(
-                arrayclass, nrestarts=10, niter=200, optimfunc=alpha
-            )
-        delta_time2 = time.time() - start_time  # in seconds
-        delta_time = delta_time2 - delta_time1
-        fac_time = runtime / delta_time
-        # print("delta_time: ", delta_time)
-        niter = int(100 * fac_time)
-        print("Niteration:", niter)
+    # First caculate number of iterations for given time
+    start_time = time.time()
+    devnull = open(os.devnull, "w")
     with redirect_stdout(devnull):
-        scores, design_efficiencies, designs, ngenerated = oapackage.Doptimize(
+        scores, design_efficiencies, designs, ngenerated = oapackage.Doptim.Doptimize(
+            arrayclass, nrestarts=10, niter=100, optimfunc=alpha
+        )
+    delta_time1 = time.time() - start_time  # in seconds
+    start_time = time.time()
+    with redirect_stdout(devnull):
+        scores, design_efficiencies, designs, ngenerated = oapackage.Doptim.Doptimize(
+            arrayclass, nrestarts=10, niter=200, optimfunc=alpha
+        )
+    delta_time2 = time.time() - start_time  # in seconds
+    delta_time = delta_time2 - delta_time1
+    fac_time = runtime / delta_time
+    # print("delta_time: " +str(delta_time))
+    niter = int(100 * fac_time)
+    #delta_time3 = time.time() - delta_time2  # in seconds
+    #print(" Runsize: "+str(runsize)+" Niteration_: "+str(niter)+" factime: "+str(fac_time))
+        
+    with redirect_stdout(devnull):
+        scores, design_efficiencies, designs, ngenerated = oapackage.Doptim.Doptimize(
             arrayclass,
-            nrestarts=nrestarts,
+            nrestarts=10,
             niter=niter,
             optimfunc=alpha,
             nabort=3000,
             maxtime=runtime,
         )
+
+    print("Runsize: "+str(runsize)+" Niterations: "+str(niter)+" Doptimize_NumOut: "+str(len(designs)))
     # Evaluate D efficiencies as weighted mean over D, Ds and D1 with weights alpha
     # Deff=[np.sum(d.Defficiencies() * np.asarray(alpha) / np.asarray(alpha).sum()) for d in designs]
     # Make evaluation based on center balance, orthogonality, and two-levelbaldance
     score = []
-
+    
     for i in range(len(designs)):
         effs = evaluate_design2(setup, np.asarray(designs[i]), printopt=False)
         # score = centereff + orthoeff + 0.5 * twoleveleff
@@ -874,7 +881,12 @@ def main(
     nrun_max=150,
     maxtime_per_run=100,
     delta_nrun=None,
+    nrun_min=None
 ):
+    if nrun_max > 500:
+        print("nrun_max of > 500 : OApackage < 2.7.7 does not support a runsize of > 500")
+
+        
     if outpath is None:
         outpath = path = Path(path)
     else:
@@ -894,14 +906,26 @@ def main(
     maxfact = np.max(setup.factor_levels)
     minfact = np.min(setup.factor_levels)
     # Set run number by factor of lowest common multiple
-    ndelta = np.lcm(minfact, maxfact)
-    # Find mimimum number of runs:
-    nrun, nrun_min = 0, 0
-    while nrun_min == 0:
-        nrun += ndelta
-        if nrun >= setup.number_of_factors + 1:
-            nrun_min = nrun
+    if delta_nrun==None:
+        ndelta = np.lcm(minfact, maxfact)
 
+    else:
+        ndelta=delta_nrun
+    # Find mimimum number of runs if not specified in input:
+    if nrun_min==None:
+        nrun, nrun_min = 0, 0
+        while nrun_min == 0:
+            nrun += ndelta
+            if nrun >= setup.number_of_factors + 1:
+                nrun_min = nrun
+
+    #Just set the nrun as the min 
+    else: 
+        nrun=nrun_min
+    #Print the starting runsize and increment 
+    print ("starting numb of exp. nrun_min: "+str(nrun_min))    
+    print ("increment numb of exp. by delta_nrun: "+str(ndelta))
+    
     # Generate optimised design array and calculate efficiencies for each runsize in range of:
     xrun = np.arange(nrun_min, nrun_max, ndelta)
     # Total run time estimate given 100s per run
@@ -915,12 +939,12 @@ def main(
         print("Sit back and relax. This may take a while.")
     elif minutes >= 180:
         print("You may want to consider a smaller runsize.")
-    print("Total estimated runtime:  " + str(minutes) + "minutes")
+    print("Total estimated runtime:  " + str(round(minutes,2)) + " minutes")
     # xrun = np.arange(201,300,ndelta)
     effs_array = np.zeros((len(xrun), 11))
     
     #Replace the previous for loop with a multiprocessing alternative.
-    multi_effs = optimize_design_multi(setup, xrun, outpath, maxtime_per_run, delta_nrun)
+    multi_effs = optimize_design_multi(setup, xrun, outpath, maxtime_per_run, ndelta)
 
     #effs_array=multi_effs
     #convert the output from multiproc to the expected array format.
@@ -1035,7 +1059,7 @@ def main(
 
     """
 	Best run:
-	score based on sum of effcieciencies and includes a small penalty for runsize relative to maximum runsize
+	score based on sum of efficiencies and includes a small penalty for runsize relative to maximum runsize
 	"""
     bestscore = (
         effs_array[:, 0]
@@ -1103,6 +1127,7 @@ def main(
 # Generate a full factorial design table
 def full_factorial_design(fname_setup,outfile='full_factorial_design_table.csv'):
     #use doegen functions to read in and initialise the design table / pandas thing from the excel input file.
+    setup = ExperimentalSetup.read(fname_setup)
     design=read_setup_new(fname_setup)
     design_levels={}
     # how many experiments are there in a full factorial design? print this.
@@ -1127,6 +1152,7 @@ def full_factorial_design(fname_setup,outfile='full_factorial_design_table.csv')
     for i in range(len(names_const)):
         df[names_const[i]] = level_const[i]
     df.to_csv(outfile, index_label="Nexp") #save to the specified or default output design table csv file.
+    return(setup)
 
 
 # Multiprocessing replacement for main optimization loop.

@@ -59,7 +59,7 @@ if __name__ == "__main__":
                               'openpyxl>=3.0.7',
                               'seaborn>=0.11.1',
                               'OApackage>=2.7.11',
-                              'tabulate>=0.8.7',
+                              'tabulate>=0.8.9',
                               'matplotlib>=3.1.0',
                               'PyYAML>=5.3.1',
                               'scikit_learn>=0.22.2.post1'],
