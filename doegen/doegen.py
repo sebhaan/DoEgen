@@ -1,19 +1,15 @@
 #!/bin/env python
 """
-Package for creation and evaluation of experiment design for any mixed-level exp desig setup.
+Package for creation and evaluation of experiment design for any mixed-level exp design setup.
 Designs are evaluated in regard to more than 10 design efficiency criteria.
-This packlage also includes also a function (eval_extarray) that allows to import externally created designs
-, e.g. with SAS tools, and to evaluate their design efficencies
+This package also includes a function (eval_extarray) that allows to import externally created designs
+, e.g. with SAS tools, and to evaluate their design efficiencies.
 
 Author: Sebastian Haan
 Affiliation: Sydney Informatics Hub (SIH), The University of Sydney
-Version: 0.1
 License: LGPL-3.0
 
 Tested with Python 3.7, see requirements.txt
-
-To Do:
-- append factors that are not included to final design arrays
 """
 
 import argparse
@@ -54,6 +50,7 @@ def gen_highD(setup, arrayclass, nkeep=2, printopt=True, outpath=None):
 	:param arrayclass: arrayclass
 	:param nkeep: Number of designs to keep at each stage
 	:param printout: if True prints array stats
+
 	RETURN
 	Design array and efficiencies
 	"""
@@ -115,6 +112,12 @@ def gen_highD(setup, arrayclass, nkeep=2, printopt=True, outpath=None):
 def test_genhighD(runsize,setup,nkeep=2, outpath=None):
     """
 	For some testing of function gen_highD().
+
+    INPUT
+    :param runsize: number of runs
+    :param setup: ExperimentalSetup
+    :param nkeep: Number of designs to keep at each stage
+    :param outpath: output directory for design files
 	"""
     maxfact = np.max(setup.factor_levels)
     minfact = np.min(setup.factor_levels)
@@ -150,6 +153,7 @@ def calc_twofactorbalance(setup, Array):
 	INPUT
 	setup: ExperimentalSetup
 	Array: experiment design array with shape (N exp runs, M factors)
+
 	RETURN
 	lb2: Two-way interaction balance level, from zero (worst) to one (optimal)
 	bl2_least1: fraction of missing combinations with minimum of one occurence
@@ -221,6 +225,9 @@ def calc_twofactorbalance(setup, Array):
 def normalize_array(Array):
     """
 	Normalize array from -1 to 1
+
+    INPUT
+    Array: experiment design array with shape (N exp runs, M factors)
 	"""
     colmax = np.max(Array, axis=0)
     colmin = np.min(Array, axis=0)
@@ -238,12 +245,14 @@ def evaluate_design2(setup, Array, printopt=False, dir_out=None, plotgrid=True):
 	Level Balance, Center Balance, Orthogonality, D-, D_s-, D1-, A-Efficiencies
 	Most indicators have a range from 0 (worst possible) to 1 (optimal)
 	Creates also correlation plots for evaluation.
+
 	INPUT
 	setup: ExperimentalSetup
 	Array: experiment design array with shape (N exp runs, M factors)
 	printopt: (optional) boolean, by default output results 
 	path_out: (optional) output dirtectoy name for diagnostis tables
 	plotgrid: (optional) plots pairwise correlation of design as cornerplot
+
 	RETURN
 	list of 11 efficiencies (normalized from 0:worst to 1:optimal):
 	Center Balance
@@ -392,7 +401,18 @@ def evaluate_design2(setup, Array, printopt=False, dir_out=None, plotgrid=True):
 
 
 def create_model(Array, mode=2, norm=True, intercept=1):
-    # Construct X matrix model from design array
+    """ Construct X matrix model from design array
+
+    INPUT
+    Array: experiment design array with shape (N exp runs, M factors)
+    mode: 1: main effects only, 2: main and quadratic effects
+    norm: if True, normalize array
+    intercept: if True, add intercept to model
+
+    RETURN
+    X: Model matrix
+    header: list of column names
+    """
     nrun, nfac = Array.shape
     # Normalize Array
     if norm:
@@ -467,7 +487,6 @@ def calc_Aeff(X):
 
 #setup,outpath,runtime,delta
 def optimize_design(setup,outpath,runtime,delta,runsize,printopt=True,nrestarts=10,niter=None):
-
     """ 
 	Optimizes design for given design specification and  array length (runsize)
 	This optimization leverages part of the the oapackage.Doptimize package. 
@@ -475,6 +494,7 @@ def optimize_design(setup,outpath,runtime,delta,runsize,printopt=True,nrestarts=
 	Parameters for oapackage have been finetuned through testing various design setups.
 	The oapackage returns multiple designs and the best design is selected based on 
 	center balance effciency, orthogonality, and two-level balance (see function evaluate_design2)
+
 	INPUT
 	setup: ExperimentalSetup
 	runsize: Number of experiments limited to a runsize of 500
@@ -484,6 +504,22 @@ def optimize_design(setup,outpath,runtime,delta,runsize,printopt=True,nrestarts=
 	nrestart: Number of restrats for optimization (Default 10)
 	niter: (Default None) Number of iterations for optimization. If None are given iterations 
 	are approximated by runtime 
+
+    RETURN
+    efficiencies: list of 11 efficiencies (normalized from 0:worst to 1:optimal):
+    Center Balance
+    Level Balance
+    Orthogonality
+    Two-way Interaction Balance
+    Two-way Interaction with at least one occurence
+    D Efficiency (main term and quadratic)
+    D1 Eff (only main terms)
+    D2 Eff (main, quadratic, and interaction terms)
+    A-Eff  (main term and quadratic)
+    A1-Eff (only main terms)
+    A2-Eff (main, quadratic, and interaction terms)
+    If dir_out is not None:
+    Tables of corraltions, level balance and two-main interaction balance
 	"""
 
     runsize=int(runsize)
@@ -563,9 +599,13 @@ def eval_extarray(setup, path, infname):
     """
 	Evaluates any given design array (e.g. externally created by SAS) 
 	and saves design efficiencies as csv file.
+
 	INPUT:
 	setup: ExperimentalSetup
 	path, infname: input path and filename of array saved as csv file (without header or index)
+
+    OUTPUT:
+    Saves design efficiencies as csv file
 	"""
     A = np.loadtxt(os.path.join(path, infname), delimiter=",")
     effs = evaluate_design2(setup, A)
@@ -609,8 +649,10 @@ def read_setup(fname_setup):
     """
 	Reading in experiment design setup file
 	(assume format same as template that is created with create_setupfile.py)
+
 	INPUT
 	fname_setup: path + filename for experiment setup excel file
+
 	RETURN
 	list of number of factor levels, list of all factor levels
 	"""
@@ -653,8 +695,10 @@ def read_setup_new(fname_setup):
     """
     Reading in experiment design setup file
     (assume format same as template that is created with create_setupfile.py)
+
     INPUT
     fname_setup: path + filename for experiment setup excel file
+
     RETURN
     list of number of factor levels, list of all factor levels
     """
@@ -726,6 +770,7 @@ def array2valuetable(setup, fname_array, fname_out):
 	setup: ExperimentalSetup
 	fname_array: input path + filename for exp design array in csv format (no header in csv)
 	fname_out: output path + filename for converted experimental table with actual level values for each run
+
 	RETURN
 	Experiment design table saved as csv file
 	"""
@@ -752,13 +797,15 @@ def post_evaluate(setup, inpath, outpath, nmin, nmax, ndelta):
     """
 	Evaluates design for given range of exp run numbers 
 	Returns design efficiency plots and saves arrays as csv in defulat outpath directoy
+
 	INPUT
 	setup: ExperimentalSetup
 	inpath: input directory name
 	nmin: from number of runs to start with
 	namx: to number of runs
 	ndelta: run n umber interval
-	Returns:
+
+	RETURN:
 	efficiency array
 	"""
     # Need updated parameter and efficiencies calculation
@@ -885,18 +932,16 @@ def main(
 ):
     if nrun_max > 500:
         print("nrun_max of > 500 : OApackage < 2.7.7 does not support a runsize of > 500")
-
-        
+      
     if outpath is None:
         outpath = path = Path(path)
     else:
         outpath = Path(outpath)
 
-    
-
     # Read-in experimental design specifications:
     setup = ExperimentalSetup.read(os.path.join(path,fname_setup))
     # print(setup.level_values)
+    print('setup:', setup)
 
     # Calculate number of total possible combinations of all factors:
     Ncombinations_total = np.product(np.asarray(setup.factor_levels))
@@ -906,9 +951,8 @@ def main(
     maxfact = np.max(setup.factor_levels)
     minfact = np.min(setup.factor_levels)
     # Set run number by factor of lowest common multiple
-    if delta_nrun==None:
+    if (delta_nrun is None) | (delta_nrun=='None'):
         ndelta = np.lcm(minfact, maxfact)
-
     else:
         ndelta=delta_nrun
     # Find mimimum number of runs if not specified in input:
