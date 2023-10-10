@@ -1,5 +1,7 @@
-from setuptools import setup, find_packages
-from numpy.distutils.core import setup, Extension
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from distutils.core import setup
 from os import path
 import os
 import subprocess
