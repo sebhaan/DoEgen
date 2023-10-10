@@ -1,8 +1,6 @@
 #!/bin/env python
 #DoEgen: A Python Library for Optimised Design of Experiment Generation and Evaluation
 #
-#Copyright 2020 Sebastian Haan
-# 
 #DoEgen is free software made available under the LGPL License. 
 #For details see the LICENSE file.
 #
@@ -100,7 +98,7 @@ The DoEgen package is currently considered experimental and has been
 tested with the libraries specified in `requirements.txt`.
 
 Installation instructions and documentation for OApackage (tested with
-OApackage 2.6.6) can be found at https://pypi.org/project/OApackage/ or
+OApackage 2.7.11) can be found at https://pypi.org/project/OApackage/ or
 can be installed with
 
 pip install OAPackage
@@ -108,5 +106,5 @@ pip install OAPackage
 Please see for more details the README.
 """
 
-__version__ = "0.4.8"
+__version__ = "0.5.0"
 __author__ = "Sebastian Haan"
