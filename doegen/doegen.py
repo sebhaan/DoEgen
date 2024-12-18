@@ -944,7 +944,7 @@ def main(
     print('setup:', setup)
 
     # Calculate number of total possible combinations of all factors:
-    Ncombinations_total = np.product(np.asarray(setup.factor_levels))
+    Ncombinations_total = np.prod(np.asarray(setup.factor_levels))
     print("Number of total combinations (Full Factorial):", Ncombinations_total)
 
     ### Make designs for multiple run sizes:
@@ -1176,7 +1176,7 @@ def full_factorial_design(fname_setup,outfile='full_factorial_design_table.csv')
     design_levels={}
     # how many experiments are there in a full factorial design? print this.
     DoE_setup=ExperimentalSetup.read(fname_setup) 
-    Ncombinations_total = np.product(np.asarray(DoE_setup.factor_levels)) 
+    Ncombinations_total = np.prod(np.asarray(DoE_setup.factor_levels)) 
     print("Generate Full Factorial experiment design table: ",Ncombinations_total," experiments")
 
     #create and fill in the design table with the variable parameters. These are the ones flagged as "Yes" in the input excel file.
