@@ -35,6 +35,7 @@ Table of Contents
     -   [Design Selection](#design-selection)
     -   [Experiment Result Analysis](#experiment-result-analysis)
 -   [Use Case Study](#use-case-study)
+-   [Codebase Tutorial](#codebase-tutorial)
 -   [Comparison to Other DoE Tools](#comparison-to-other-doe-tools)
 -   [Literature](#literature)
 -   [Attribution and Acknowledgments](#attribution-and-acknowledgements)
@@ -522,6 +523,11 @@ each factor for the top experiments as shown in bar plot below.
 Furthermore, multiple other diagnostics plots such as factor-Y
 correlation and pairwise correlation maps with RMSE are generated (see [Experiment
 Result Analysis](#experiment-result-analysis) for more details).
+
+Codebase Tutorial
+-----------------
+
+For a more in-depth look at how DoEgen actually works, head over to the [DoEgen Tutorial](https://github.com/sebhaan/DoEgen/blob/main/docs/DoEgen_explained/index.md).
 
 Comparison to Other DoE Tools
 -----------------------------
